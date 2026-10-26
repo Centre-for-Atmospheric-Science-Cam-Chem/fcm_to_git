@@ -62,6 +62,8 @@ GitHub:  tag um13.7  ──> your branch: one commit per FCM revision
    the `fcm_to_git.sh` script does this.
 5. [Review the commits, then push](05-review-and-push.md) - check, then send
    to your fork on GitHub.
+6. *Optional:* [Bring your branch up to the first GitHub release](06-merge-first-release.md) -
+   only if you want to carry on developing your branch on GitHub.
 
 ## What you need
 

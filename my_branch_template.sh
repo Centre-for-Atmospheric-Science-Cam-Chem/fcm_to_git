@@ -20,8 +20,17 @@ FCM_URL=CHANGE_ME
 # step 3.1.
 START=CHANGE_ME
 
+# Optional step 6: the release to merge into a copy of your branch -
+# 2025.12.1, the first GitHub release (recommended), or git_migration, the
+# last FCM trunk.
+MERGE_TAG=2025.12.1
+
 # You should not need to change anything below this line.
 WORK=~/fcm_to_git_work
 BRANCH=$(basename "$FCM_URL")
+# Step 6 copy: the branch name with its start (e.g. um13.7_, vn12.0_ or
+# r5137_) replaced by MERGE_TAG, the code it is then based on.
+MERGED_BRANCH=${MERGE_TAG}_$(sed -E 's/^((um|vn)[0-9.]+|r[0-9]+)_//' \
+                               <<<"$BRANCH")
 GH_CLONE=$WORK/github/$REPO_NAME
 FCM_TO_GIT=$WORK/fcm_to_git/fcm_to_git.sh

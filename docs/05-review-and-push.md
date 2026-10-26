@@ -115,7 +115,11 @@ In a browser, go to `https://github.com/<your username>/ukca`, click the
 branch menu (it says `main`, top left) and choose your branch. Click the
 commit count (clock icon) to see your commits.
 
-Your branch is now on GitHub, with its full history.
+Your branch is now on GitHub, with its full history. For most branches,
+that's it - you are done.
+
+Optional: [step 6](06-merge-first-release.md) - only if you want to carry on
+developing your branch on GitHub.
 
 ## If something looks wrong
 

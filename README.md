@@ -14,6 +14,7 @@ run them, and what you should see.
 3. [Create a GitHub branch for your work](docs/03-create-github-branch.md)
 4. [Copy your FCM commits onto the git branch](docs/04-convert-commits.md) - runs `fcm_to_git.sh`
 5. [Review the commits, then push](docs/05-review-and-push.md)
+6. *Optional:* [Bring your branch up to the first GitHub release](docs/06-merge-first-release.md)
 
 Something not working? See [Troubleshooting](docs/troubleshooting.md).
 

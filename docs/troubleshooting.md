@@ -13,6 +13,7 @@ printed.
 - [Step 3 - Create the GitHub branch](#step-3---create-the-github-branch)
 - [Step 4 - Run fcm_to_git.sh](#step-4---run-fcm_to_gitsh)
 - [Step 5 - Review and push](#step-5---review-and-push)
+- [Step 6 - Merge a release](#step-6---merge-a-release)
 
 ## Any step
 
@@ -477,3 +478,89 @@ git branch -D "$BRANCH"
 Actions are still on for your fork - turn them off as in
 [2.2](02-fork-and-tags.md#22-turn-off-github-actions-on-your-fork). The runs
 do no harm; you can ignore them.
+
+## Step 6 - Merge a release
+
+### `merge: 2025.12.1 - not something we can merge`
+
+Your clone does not have the tag. Download the tags and try again:
+
+```bash
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
+git fetch upstream --tags
+```
+
+If it says `merge: - not something we can merge` (no release name), your
+details file has no `MERGE_TAG` line - see
+[6.1](06-merge-first-release.md#61-make-a-copy-of-your-branch).
+
+### `Already up to date.`
+
+Your branch already includes that release - nothing to do.
+
+### `Please commit your changes or stash them before you merge`
+
+You have changed files in your clone since step 5. `git status` lists them.
+If you do not need them, remove them with `git reset --hard`; otherwise copy
+them somewhere safe first.
+
+### `You have not concluded your merge (MERGE_HEAD exists)` / `you have unmerged files`
+
+A merge is still in progress. Either finish it (fix the conflicts, `git add`
+the files, then `git commit --no-edit` - see
+[6.3](06-merge-first-release.md#63-fix-the-conflicts)) or cancel it with
+`git merge --abort`.
+
+### `git commit` opened an editor
+
+You left out `--no-edit`. The message is already filled in - just save and
+close: in `vi` type `:wq` and press Enter; in `nano` press `Ctrl+O`, Enter,
+then `Ctrl+X`.
+
+### I made the merge commit, but got it wrong
+
+The merge is on the copy (e.g. `2025.12.1_...`), so your migrated branch is
+fine. Delete the copy and start step 6 again:
+
+```bash
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
+git switch "$BRANCH"
+git branch -D "$MERGED_BRANCH"
+```
+
+If you had already pushed the copy, also delete it from your fork:
+
+```bash
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
+git push origin --delete "$MERGED_BRANCH"
+```
+
+### `fatal: a branch named '2025.12.1_...' already exists`
+
+You made the copy before. To carry on with it, switch to it:
+`git switch "$MERGED_BRANCH"`. To start again, delete it as in
+[the entry above](#i-made-the-merge-commit-but-got-it-wrong) and redo 6.1.
+
+### `fatal: '_...' is not a valid branch name`
+
+`MERGED_BRANCH` is missing its release - your details file has no
+`MERGE_TAG` line, or it comes after the `MERGED_BRANCH` line. See
+[6.1](06-merge-first-release.md#61-make-a-copy-of-your-branch).
+
+### There are too many conflicts to sort out
+
+Cancel with `git merge --abort` - the copy is back as it was, and your
+migrated branch was never touched. Step 6 is optional, so you can simply
+stop here. If you do need the merge, talk to someone who knows the code you
+changed: the conflicts are the same ones an `fcm merge` of trunk would give,
+so they need the same care.
+
+### The test suite still fails after the merge
+
+Check `dependencies.yaml` (step
+[6.4](06-merge-first-release.md#64-update-dependenciesyaml)): every `ref:`
+should be a release such as `2025.12.1`, or your own branch. Old test suite
+changes on your branch may also need redoing in the new `.cylc` files.
