@@ -53,7 +53,7 @@ GitHub:  tag um13.7  ──> your branch: one commit per FCM revision
 ```
 
 1. [Find your FCM branch and where it started](01-find-fcm-branch.md) -
-   which release (e.g. `um13.7`) your branch started from.
+   its address, and which release (e.g. `um13.7`) it started from.
 2. [Fork UKCA on GitHub and bring across the tags](02-fork-and-tags.md) -
    your own copy of UKCA, on GitHub and on your computer.
 3. [Create a GitHub branch for your work](03-create-github-branch.md) -
@@ -141,14 +141,13 @@ Everything goes in one folder, `~/fcm_to_git_work`:
 ~/fcm_to_git_work/
 ├── fcm_to_git/      this guide and the conversion script
 ├── my_branch.sh     your details (made below)
-├── fcm/             your FCM checkout (step 1)
 └── github/          your GitHub clone of UKCA (step 2)
 ```
 
 **Run in:** anywhere
 
 ```bash
-mkdir -p ~/fcm_to_git_work/fcm ~/fcm_to_git_work/github
+mkdir -p ~/fcm_to_git_work/github
 cd ~/fcm_to_git_work
 git clone git@github.com:RobWatersMet/fcm_to_git.git
 cp fcm_to_git/my_branch_template.sh my_branch.sh

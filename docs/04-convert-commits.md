@@ -125,7 +125,7 @@ What to do:
 
    ```bash
    source ~/fcm_to_git_work/my_branch.sh
-   cd ~/fcm_to_git_work/github/ukca
+   cd "$GH_CLONE"
    git switch main
    git branch -D "$BRANCH"
    git switch -c "$BRANCH" "$START"

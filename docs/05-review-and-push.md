@@ -14,7 +14,7 @@ Problems? See [Troubleshooting: Step 5](troubleshooting.md#step-5---review-and-p
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github/ukca
+cd "$GH_CLONE"
 git log --oneline "$START..$BRANCH"
 ```
 
@@ -38,7 +38,7 @@ press `q` to get back.
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github/ukca
+cd "$GH_CLONE"
 git rev-list --count "$START..$BRANCH"
 ```
 
@@ -53,7 +53,8 @@ To see what one commit changed, use its short code from 5.1:
 **Run in:** your GitHub clone
 
 ```bash
-cd ~/fcm_to_git_work/github/ukca
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
 git show d67857b
 ```
 
@@ -79,7 +80,7 @@ The changes should be the same.
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github/ukca
+cd "$GH_CLONE"
 git diff --stat "$START" "$BRANCH"
 ```
 
@@ -95,7 +96,7 @@ When you are happy:
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github/ukca
+cd "$GH_CLONE"
 git push -u origin "$BRANCH"
 ```
 
@@ -125,7 +126,7 @@ Your branch is now on GitHub, with its full history.
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github/ukca
+cd "$GH_CLONE"
 git switch main
 git branch -D "$BRANCH"
 ```

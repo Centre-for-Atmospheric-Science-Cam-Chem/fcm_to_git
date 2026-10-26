@@ -59,7 +59,7 @@ go ahead and enable them* - do **not** click it.
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github
+cd "$WORK/github"
 git clone "git@github.com:$GH_USER/ukca.git"
 ```
 
@@ -74,7 +74,8 @@ as `upstream`:
 **Run in:** your GitHub clone
 
 ```bash
-cd ~/fcm_to_git_work/github/ukca
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
 git remote add upstream git@github.com:MetOffice/ukca.git
 git remote -v
 ```
@@ -94,7 +95,8 @@ upstream  git@github.com:MetOffice/ukca.git (push)
 **Run in:** your GitHub clone
 
 ```bash
-cd ~/fcm_to_git_work/github/ukca
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
 git fetch upstream --tags
 git push origin --tags
 ```
@@ -112,7 +114,7 @@ that is fine too.
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github/ukca
+cd "$GH_CLONE"
 git ls-remote --tags origin "$START"
 ```
 
@@ -143,7 +145,8 @@ MetOffice adds new releases over time. When you start on another branch:
    **Run in:** your GitHub clone
 
    ```bash
-   cd ~/fcm_to_git_work/github/ukca
+   source ~/fcm_to_git_work/my_branch.sh
+   cd "$GH_CLONE"
    git fetch upstream --tags
    git push origin --tags
    ```

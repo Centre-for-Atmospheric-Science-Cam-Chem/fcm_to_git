@@ -26,7 +26,8 @@ Replace `5137` below with the number from your branch name, then run:
 **Run in:** your GitHub clone
 
 ```bash
-cd ~/fcm_to_git_work/github/ukca
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
 REV=5137
 git log --format='commit %H%n%b' git_migration \
   | awk -v rev="$REV" '/^commit /{h=$2} /git-svn-id:/{split($2, a, "@"); if (a[2] + 0 <= rev) {print h; exit}}'
@@ -49,7 +50,7 @@ and save the file.
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github/ukca
+cd "$GH_CLONE"
 git switch -c "$BRANCH" "$START"
 ```
 
@@ -67,7 +68,8 @@ Switched to a new branch 'um13.7_transformed_ukca_gpuport_nvtx_calipers'
 **Run in:** your GitHub clone
 
 ```bash
-cd ~/fcm_to_git_work/github/ukca
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
 git status
 ```
 

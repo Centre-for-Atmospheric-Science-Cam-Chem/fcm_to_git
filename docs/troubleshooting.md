@@ -105,10 +105,10 @@ Set your name and email - see
 
 ## Step 1 - Find your FCM branch
 
-### `fcm co` says `URL ... doesn't exist` or `path not found`
+### `URL ... doesn't exist` or `path not found`
 
-The branch name is wrong. List your branches to get it exactly (replace
-`robertwaters` with your MOSRS username):
+The branch address is wrong. List your branches to get the name exactly
+(replace `robertwaters` with your MOSRS username):
 
 ```bash
 fcm ls fcm:ukca.x_br/dev/robertwaters
@@ -135,16 +135,16 @@ Use `fcm:ukca.x` (with `.x`), not `fcm:ukca`.
 
 ### `fcm branch-info` says `not a working copy` or `not a valid branch`
 
-Run it inside your FCM checkout:
+Give it your branch address - load your details file first:
 
 ```bash
-cd ~/fcm_to_git_work/fcm/<your branch name>
-fcm branch-info
+source ~/fcm_to_git_work/my_branch.sh
+fcm branch-info "$FCM_URL"
 ```
 
 ### There is no `Branch Parent` line
 
-Make sure you checked out a branch (the address has `branches/dev/...` in it),
+Make sure `FCM_URL` is a branch (the address has `branches/dev/...` in it),
 not trunk.
 
 ### My branch name starts with a release, but `Branch Parent` is a different one
@@ -175,7 +175,8 @@ file is exactly your GitHub username (`echo "$GH_USER"`).
 
 ### `git clone` says `destination path 'ukca' already exists`
 
-You already have a clone there. Use it: `cd ~/fcm_to_git_work/github/ukca`.
+You already have a clone there. Use it: run
+`source ~/fcm_to_git_work/my_branch.sh` then `cd "$GH_CLONE"`.
 Check it is your fork with `git remote -v` - `origin` should show your
 username.
 
@@ -200,7 +201,8 @@ Make sure you ran both commands in 2.5, in your GitHub clone. Then check the
 tag exists in MetOffice's repository:
 
 ```bash
-cd ~/fcm_to_git_work/github/ukca
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
 git ls-remote --tags upstream "$START"
 ```
 
@@ -214,7 +216,8 @@ If this prints nothing too, the release name is wrong - check it against
 Your clone does not have that tag. Download the tags and try again:
 
 ```bash
-cd ~/fcm_to_git_work/github/ukca
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
 git fetch upstream --tags
 ```
 
@@ -249,7 +252,7 @@ start again, delete it and redo step 3:
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github/ukca
+cd "$GH_CLONE"
 git switch main
 git branch -D "$BRANCH"
 ```
@@ -259,7 +262,8 @@ If you have run step 4 and just want to carry on, switch to it instead:
 
 ### `fatal: not a git repository`
 
-You are not in your GitHub clone. Run `cd ~/fcm_to_git_work/github/ukca` first.
+You are not in your GitHub clone. Run `source ~/fcm_to_git_work/my_branch.sh`
+then `cd "$GH_CLONE"` first.
 
 ### Step 3.1 prints nothing
 
@@ -301,7 +305,7 @@ Your GitHub clone is not on the branch from step 3. Switch to it:
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github/ukca
+cd "$GH_CLONE"
 git switch "$BRANCH"
 ```
 
@@ -316,7 +320,8 @@ lists the files above the error.
   over from that run. Remove them and run the script again:
 
   ```bash
-  cd ~/fcm_to_git_work/github/ukca
+  source ~/fcm_to_git_work/my_branch.sh
+  cd "$GH_CLONE"
   git reset --hard
   git clean -fd
   ```
@@ -342,7 +347,7 @@ Fix `START` in your details file, then delete the branch and redo step 3:
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github/ukca
+cd "$GH_CLONE"
 git switch main
 git branch -D "$BRANCH"
 ```
@@ -395,7 +400,8 @@ copied so far are kept. Tidy up, make sure you are logged in to MOSRS, then
 run the script again - it carries on from where it stopped:
 
 ```bash
-cd ~/fcm_to_git_work/github/ukca
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
 git reset --hard
 git clean -fd
 mosrs-cache-password
@@ -445,7 +451,7 @@ old attempt you do not want, replace it:
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github/ukca
+cd "$GH_CLONE"
 git push --force-with-lease -u origin "$BRANCH"
 ```
 
@@ -458,7 +464,7 @@ your fork and from your computer, then redo steps 3 to 5:
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-cd ~/fcm_to_git_work/github/ukca
+cd "$GH_CLONE"
 git push origin --delete "$BRANCH"
 git switch main
 git branch -D "$BRANCH"

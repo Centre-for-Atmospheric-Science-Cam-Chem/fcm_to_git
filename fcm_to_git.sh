@@ -145,7 +145,8 @@ if ! svn_err=$(svn info --non-interactive "$svn_url" 2>&1 >/dev/null); then
 fi
 
 # Every revision on the branch, oldest first. The first one created the branch
-# (the copy from trunk), so it is the starting point rather than a change.
+# (the copy it was made from), so it is the starting point rather than a
+# change.
 # mapfile stores each revision in a bash array
 mapfile -t revs < <(svn log -q --stop-on-copy -r 1:HEAD "$svn_url" \
                       | sed -n 's/^r\([0-9]\+\) |.*/\1/p')
