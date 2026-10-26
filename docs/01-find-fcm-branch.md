@@ -34,7 +34,8 @@ List your branches (replace `robertwaters` with your MOSRS username):
 **Run in:** anywhere
 
 ```bash
-fcm ls fcm:ukca.x_br/dev/robertwaters
+source ~/fcm_to_git_work/my_branch.sh
+fcm ls "fcm:$REPO_NAME.x_br/dev/robertwaters"
 ```
 
 **You should see** your branch names, e.g.
@@ -47,7 +48,8 @@ um13.7_transformed_ukca_gpuport_nvtx_calipers/
 
 Your branch address is
 `https://code.metoffice.gov.uk/svn/ukca/main/branches/dev/` followed by your
-MOSRS username and the branch name. Put it into your details file
+MOSRS username and the branch name (with `um` or `lfric_apps` in place of
+`ukca` for those repositories). Put it into your details file
 (`~/fcm_to_git_work/my_branch.sh`), replacing the `CHANGE_ME` after
 `FCM_URL=`:
 
@@ -127,7 +129,8 @@ here 4898. To see if that is a release:
 **Run in:** anywhere
 
 ```bash
-fcm keyword-print fcm:ukca.x
+source ~/fcm_to_git_work/my_branch.sh
+fcm keyword-print "fcm:$REPO_NAME.x"
 ```
 
 ```

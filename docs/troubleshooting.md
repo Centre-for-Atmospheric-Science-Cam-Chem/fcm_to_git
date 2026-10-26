@@ -111,7 +111,8 @@ The branch address is wrong. List your branches to get the name exactly
 (replace `robertwaters` with your MOSRS username):
 
 ```bash
-fcm ls fcm:ukca.x_br/dev/robertwaters
+source ~/fcm_to_git_work/my_branch.sh
+fcm ls "fcm:$REPO_NAME.x_br/dev/robertwaters"
 ```
 
 ### `fcm status` lists files
@@ -186,7 +187,8 @@ Fine - it was added before. Check it with `git remote -v`: `upstream` should
 be `git@github.com:MetOffice/ukca.git`. If it is something else:
 
 ```bash
-git remote set-url upstream git@github.com:MetOffice/ukca.git
+source ~/fcm_to_git_work/my_branch.sh
+git remote set-url upstream "git@github.com:MetOffice/$REPO_NAME.git"
 ```
 
 ### `git push origin --tags` says `! [rejected] ... (already exists)`

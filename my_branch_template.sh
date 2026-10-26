@@ -8,6 +8,9 @@
 # Your GitHub username (step 0).
 GH_USER=CHANGE_ME
 
+# The repository your branch is in: ukca, um or lfric_apps (step 0).
+REPO_NAME=ukca
+
 # Your FCM branch address (step 1.2). It starts
 # https://code.metoffice.gov.uk/svn/ukca/main/branches/dev/
 FCM_URL=CHANGE_ME
@@ -20,5 +23,5 @@ START=CHANGE_ME
 # You should not need to change anything below this line.
 WORK=~/fcm_to_git_work
 BRANCH=$(basename "$FCM_URL")
-GH_CLONE=$WORK/github/ukca
+GH_CLONE=$WORK/github/$REPO_NAME
 FCM_TO_GIT=$WORK/fcm_to_git/fcm_to_git.sh

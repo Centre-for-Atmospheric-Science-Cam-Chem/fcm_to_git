@@ -158,8 +158,9 @@ cp fcm_to_git/my_branch_template.sh my_branch.sh
 `~/fcm_to_git_work/my_branch.sh` holds the details of your branch, so you do
 not have to type long names again and again. Open it in a text editor (e.g.
 `vi ~/fcm_to_git_work/my_branch.sh` or `nano`). Replace the
-`CHANGE_ME` after `GH_USER=` with your GitHub username now. The other two you
-fill in during step 1.
+`CHANGE_ME` after `GH_USER=` with your GitHub username now. If your branch
+is not in UKCA, also change `REPO_NAME=ukca` to `um` or `lfric_apps`. The
+other two `CHANGE_ME`s you fill in during step 1.
 
 The later steps start with:
 

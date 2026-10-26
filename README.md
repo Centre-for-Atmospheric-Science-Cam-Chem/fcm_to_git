@@ -22,6 +22,7 @@ Something not working? See [Troubleshooting](docs/troubleshooting.md).
 The guide is written for UKCA, but `fcm_to_git.sh` should work for any FCM
 project that has moved to GitHub with its trunk history. It has been tested on
 branches of `um` and `lfric_apps` as well as `ukca`. For another project,
-replace `ukca` in the commands with the project's name - e.g.
-`MetOffice/lfric_apps`, `fcm:lfric_apps.x`. The UM and LFRic Apps tag their
+set `REPO_NAME` in your details file (see
+[step 0](docs/00-before-you-start.md#your-details-file)) to `um` or
+`lfric_apps` - the commands then use the right repository. The UM and LFRic Apps tag their
 releases `vn13.9`, `vn2.2` and so on, rather than `um13.9`.

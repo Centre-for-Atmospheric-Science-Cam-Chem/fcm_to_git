@@ -26,9 +26,12 @@ GitHub never does. So we copy them ourselves, in 2.5.
 
 In a web browser:
 
-1. Go to <https://github.com/MetOffice/ukca> and log in.
+1. Go to <https://github.com/MetOffice/ukca> and log in. (For the UM or
+   LFRic Apps, go to <https://github.com/MetOffice/um> or
+   <https://github.com/MetOffice/lfric_apps> instead.)
 2. Click **Fork** (top right).
-3. **Owner:** your username. **Repository name:** leave as `ukca`.
+3. **Owner:** your username. **Repository name:** leave it as it is (e.g.
+   `ukca`).
 4. Leave **Copy the main branch only** ticked.
 5. Click **Create fork**.
 
@@ -60,7 +63,7 @@ go ahead and enable them* - do **not** click it.
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
 cd "$WORK/github"
-git clone "git@github.com:$GH_USER/ukca.git"
+git clone "git@github.com:$GH_USER/$REPO_NAME.git"
 ```
 
 **You should see** `Cloning into 'ukca'...` and a few progress lines. You now
@@ -76,7 +79,7 @@ as `upstream`:
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
 cd "$GH_CLONE"
-git remote add upstream git@github.com:MetOffice/ukca.git
+git remote add upstream "git@github.com:MetOffice/$REPO_NAME.git"
 git remote -v
 ```
 
