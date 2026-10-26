@@ -23,9 +23,9 @@ with a short code, then `fcm_to_git` and the original FCM revision, author and
 date:
 
 ```
-033a7d6 fcm_to_git [r5863 robertwaters 2025-04-02 10:18]: #233 - added the psyclone transformer to the repo directly
-8b9c7c4 fcm_to_git [r5796 robertwaters 2025-03-24 11:21]: #233 - undoing changes from Edingbugh - no longer needed
-3a1be0c fcm_to_git [r5778 robertwaters 2025-03-21 11:47]: revert to original, pre-psyclone1
+d67857b fcm_to_git [r5863 robertwaters 2025-04-02 10:18]: #233 - added the psyclone transformer to the repo directly
+1389394 fcm_to_git [r5796 robertwaters 2025-03-24 11:21]: #233 - undoing changes from Edingbugh - no longer needed
+e9f4689 fcm_to_git [r5778 robertwaters 2025-03-21 11:47]: revert to original, pre-psyclone1
 ...
 ```
 
@@ -54,7 +54,7 @@ To see what one commit changed, use its short code from 5.1:
 
 ```bash
 cd ~/fcm_to_git_work/github/ukca
-git show 033a7d6
+git show d67857b
 ```
 
 **You should see** the commit message with its `FCM-Revision:` line, then the

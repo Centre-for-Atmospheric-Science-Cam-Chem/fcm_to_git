@@ -8,7 +8,7 @@ printed.
 
 - [Any step](#any-step)
 - [Step 0 - Before you start](#step-0---before-you-start)
-- [Step 1 - Check out your FCM branch](#step-1---check-out-your-fcm-branch)
+- [Step 1 - Find your FCM branch](#step-1---find-your-fcm-branch)
 - [Step 2 - Fork and tags](#step-2---fork-and-tags)
 - [Step 3 - Create the GitHub branch](#step-3---create-the-github-branch)
 - [Step 4 - Run fcm_to_git.sh](#step-4---run-fcm_to_gitsh)
@@ -103,7 +103,7 @@ Normal the first time. Type `yes` and press Enter.
 Set your name and email - see
 [step 0](00-before-you-start.md#check-your-machine-is-ready).
 
-## Step 1 - Check out your FCM branch
+## Step 1 - Find your FCM branch
 
 ### `fcm co` says `URL ... doesn't exist` or `path not found`
 
@@ -221,6 +221,22 @@ git fetch upstream --tags
 If you see `invalid reference: CHANGE_ME`, `START` is not filled in - see
 [above](#change_me-appears-in-an-error-or-a-value-is-empty).
 
+If it still fails after fetching the tags, that release has no tag on GitHub.
+A few FCM releases were not given one - e.g. `vn13.8.1` (UM) and `vn2.2.1`
+(LFRic Apps). Find its trunk revision with `fcm keyword-print`, e.g.
+
+```bash
+fcm keyword-print fcm:lfric_apps.x | grep vn2.2.1
+```
+
+```
+revision[lfric_apps.x:vn2.2.1] = 13227
+```
+
+and treat your branch as if its name started with `r` and that number
+(`r13227`) - see
+[step 3.1](03-create-github-branch.md#31-only-if-your-branch-name-starts-with-r-find-the-starting-commit).
+
 ### `fatal: '' is not a valid branch name` or `fatal: missing branch name`
 
 Your details file is not loaded in this terminal - run
@@ -279,7 +295,7 @@ The second thing after the script name must be your GitHub clone. Check
 `echo "$GH_CLONE"` prints `.../fcm_to_git_work/github/ukca`, and that folder
 exists (step 2.3).
 
-### `ERROR: '...' is on 'main'` / `is not on a branch`
+### `ERROR: '...' is on 'main'` (or `'master'`) / `is not on a branch`
 
 Your GitHub clone is not on the branch from step 3. Switch to it:
 
@@ -315,7 +331,7 @@ without changing anything. The lines above the error list the files that
 differ. Usually:
 
 - `START` is wrong - recheck it with `fcm branch-info`, as in
-  [step 1.4](01-checkout-fcm-branch.md#if-your-branch-name-starts-with-neither)
+  [step 1.4](01-find-fcm-branch.md#if-your-branch-name-starts-with-neither)
   (the branch name may not match where the branch really started); or
 - the branch was made from `main` rather than from `START`; or
 - your branch was made from someone else's branch - the script then prints a

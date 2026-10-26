@@ -20,14 +20,14 @@ The script reads your branch from MOSRS, so first make sure `svn` can log in:
 mosrs-cache-password
 ```
 
-Then a dry run with `-n`. It only lists what it would do, and changes
+Then a dry run with `-d`. It only lists what it would do, and changes
 nothing:
 
 **Run in:** anywhere
 
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
-"$FCM_TO_GIT" -n "$FCM_URL" "$GH_CLONE"
+"$FCM_TO_GIT" -d "$FCM_URL" "$GH_CLONE"
 ```
 
 **You should see** your branch details and a list of your FCM commits:
@@ -35,12 +35,15 @@ source ~/fcm_to_git_work/my_branch.sh
 ```
 fcm_to_git: FCM branch:  https://code.metoffice.gov.uk/svn/ukca/main/branches/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers
 fcm_to_git: git branch:  um13.7_transformed_ukca_gpuport_nvtx_calipers (/home/robertwaters/fcm_to_git_work/github/ukca)
-fcm_to_git: created at:  r5373
+fcm_to_git: created at:  r5373, from /main/trunk@4898
 fcm_to_git: to convert:  107 of 107 revisions
-  r5376  Asad code is now version that comes out of psyclone
-  r5382  Issue with local char var resolved by upgrading the latest copy of Psyclone
+  fcm_to_git [r5376 robertwaters 2025-02-04 13:03]: Asad code is now version that comes out of psyclone
+  fcm_to_git [r5382 robertwaters 2025-02-05 12:33]: Issue with local char var resolved by upgrading the latest copy of Psyclone
   ...
 ```
+
+Each line is the subject of a git commit the script will make: the original
+FCM revision, author and date, then the first line of the FCM message.
 
 Check:
 
@@ -54,7 +57,7 @@ Check:
 
 ## 4.2 Run it
 
-The same command without `-n`:
+The same command without `-d`:
 
 **Run in:** anywhere
 
@@ -63,13 +66,21 @@ source ~/fcm_to_git_work/my_branch.sh
 "$FCM_TO_GIT" "$FCM_URL" "$GH_CLONE"
 ```
 
-It shows one line per commit as it goes. A branch with about 100 commits takes
-a couple of minutes.
+It shows one line per commit as it goes - the new git commit's short code and
+subject. A branch with about 100 commits takes a couple of minutes.
 
-**You should see** at the end:
+**You should see:**
 
 ```
-fcm_to_git: [107/107] r5863 -> 033a7d6  #233 - added the psyclone transformer to the repo directly
+fcm_to_git: FCM branch:  https://code.metoffice.gov.uk/svn/ukca/main/branches/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers
+fcm_to_git: git branch:  um13.7_transformed_ukca_gpuport_nvtx_calipers (/home/robertwaters/fcm_to_git_work/github/ukca)
+fcm_to_git: created at:  r5373, from /main/trunk@4898
+fcm_to_git: to convert:  107 of 107 revisions
+fcm_to_git: checking out r5373 ...
+fcm_to_git: [1/107] 54d4a32 fcm_to_git [r5376 robertwaters 2025-02-04 13:03]: Asad code is now version that comes out of psyclone
+fcm_to_git: [2/107] 9c7c5e4 fcm_to_git [r5382 robertwaters 2025-02-05 12:33]: Issue with local char var resolved by upgrading the latest copy of Psyclone
+...
+fcm_to_git: [107/107] d67857b fcm_to_git [r5863 robertwaters 2025-04-02 10:18]: #233 - added the psyclone transformer to the repo directly
 fcm_to_git: done - 'um13.7_transformed_ukca_gpuport_nvtx_calipers' matches the FCM branch at r5863
 fcm_to_git: nothing has been pushed - review the commits (docs/05-review-and-push.md)
 ```
@@ -123,8 +134,16 @@ What to do:
 2. Run the dry run again. The list now starts with the extra commit:
 
    ```
-     r5792  (first commit: code from /main/branches/dev/josephwallwork/um13.8_ukca_gpuport@5776)
-     r5794  #233 - removed psyclone processed files, ...
+     fcm_to_git [r5792 robertwaters 2025-03-24 10:18]: Code from /main/branches/dev/josephwallwork/um13.8_ukca_gpuport@5776
+     fcm_to_git [r5794 robertwaters 2025-03-24 10:56]: #233 - removed psyclone processed files, processed files will go in own branch to allow easy testing
+     ...
+   ```
+
+   When you run it for real, that commit is shown as `[start]`:
+
+   ```
+   fcm_to_git: [start] 4a6f398 fcm_to_git [r5792 robertwaters 2025-03-24 10:18]: Code from /main/branches/dev/josephwallwork/um13.8_ukca_gpuport@5776
+   fcm_to_git: [1/10] e88148f fcm_to_git [r5794 robertwaters 2025-03-24 10:56]: #233 - removed psyclone processed files, ...
    ```
 
 3. Run the script for real (4.2).

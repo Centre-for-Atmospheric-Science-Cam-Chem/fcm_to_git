@@ -52,7 +52,7 @@ FCM:     trunk r4898 ──> your branch: r5376, r5382, ... r5863
 GitHub:  tag um13.7  ──> your branch: one commit per FCM revision
 ```
 
-1. [Check out your FCM branch and find its version](01-checkout-fcm-branch.md) -
+1. [Find your FCM branch and where it started](01-find-fcm-branch.md) -
    which release (e.g. `um13.7`) your branch started from.
 2. [Fork UKCA on GitHub and bring across the tags](02-fork-and-tags.md) -
    your own copy of UKCA, on GitHub and on your computer.
@@ -158,7 +158,7 @@ cp fcm_to_git/my_branch_template.sh my_branch.sh
 
 `~/fcm_to_git_work/my_branch.sh` holds the details of your branch, so you do
 not have to type long names again and again. Open it in a text editor (e.g.
-`nano ~/fcm_to_git_work/my_branch.sh`, or `gedit`, or `vi`). Replace the
+`vi ~/fcm_to_git_work/my_branch.sh` or `nano`). Replace the
 `CHANGE_ME` after `GH_USER=` with your GitHub username now. The other two you
 fill in during step 1.
 
