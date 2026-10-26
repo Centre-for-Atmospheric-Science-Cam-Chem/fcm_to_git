@@ -1,37 +1,165 @@
 # 4. Copy your FCM commits onto the git branch
 
-`fcm_to_git.sh` (at the top of this repository) copies every commit of your FCM
-branch onto the git branch from [step 3](03-create-github-branch.md), one git
-commit per SVN revision, keeping the original messages.
+In this step the script `fcm_to_git.sh` copies every commit of your FCM branch
+onto the git branch from step 3 - one git commit per FCM revision, with the
+same message.
 
-It only works in your local git clone. **It never pushes** - that is
-[step 5](05-review-and-push.md), after you have reviewed the result.
+It only changes your GitHub clone on your computer. **It never pushes to
+GitHub** - that is step 5, after you have checked the result. It does not
+change your FCM branch or your FCM checkout.
 
-## What it does
+Problems? See [Troubleshooting: Step 4](troubleshooting.md#step-4---run-fcm_to_gitsh).
 
-1. Lists the revisions of your FCM branch (`svn log --stop-on-copy`). The first
-   one is the copy from trunk that created the branch; the rest are your
-   commits.
-2. Checks out the branch, at the revision it was created, into a temporary
-   directory, and checks the git branch holds exactly the same code. If not, it
-   stops - the git branch was made from the wrong tag or commit.
-3. For each revision:
-   - updates the temporary checkout to that revision
-   - copies it into the git clone, as in the Met Office guide:
-     `rsync -a --delete --exclude=.git --exclude=.svn`
-   - commits it with the original SVN message
-4. Checks the git branch now holds exactly the same code as the last revision
-   of your FCM branch.
+## 4.1 Dry run
 
-Your own FCM working copy is not touched.
+The script reads your branch from MOSRS, so first make sure `svn` can log in:
 
-## Commit messages
+**Run in:** anywhere
 
-Each commit message is the SVN message, prefixed with `fcm_to_git:`, followed
-by details of the original SVN commit:
+```bash
+mosrs-cache-password
+```
+
+Then a dry run with `-n`. It only lists what it would do, and changes
+nothing:
+
+**Run in:** anywhere
+
+```bash
+source ~/fcm_to_git_work/my_branch.sh
+"$FCM_TO_GIT" -n "$FCM_URL" "$GH_CLONE"
+```
+
+**You should see** your branch details and a list of your FCM commits:
 
 ```
-fcm_to_git: Reverted back to r5460 - added back in openmp
+fcm_to_git: FCM branch:  https://code.metoffice.gov.uk/svn/ukca/main/branches/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers
+fcm_to_git: git branch:  um13.7_transformed_ukca_gpuport_nvtx_calipers (/home/robertwaters/fcm_to_git_work/github/ukca)
+fcm_to_git: created at:  r5373
+fcm_to_git: to convert:  107 of 107 revisions
+  r5376  Asad code is now version that comes out of psyclone
+  r5382  Issue with local char var resolved by upgrading the latest copy of Psyclone
+  ...
+```
+
+Check:
+
+- There is no `WARNING` - if there is, see
+  [If your branch was made from another branch](#if-your-branch-was-made-from-another-branch).
+- **FCM branch** is your branch.
+- **git branch** is the branch you made in step 3 (named after your FCM
+  branch), not `main`.
+- The list looks like your commits. Note the **to convert** number - you check
+  it again in step 5.
+
+## 4.2 Run it
+
+The same command without `-n`:
+
+**Run in:** anywhere
+
+```bash
+source ~/fcm_to_git_work/my_branch.sh
+"$FCM_TO_GIT" "$FCM_URL" "$GH_CLONE"
+```
+
+It shows one line per commit as it goes. A branch with about 100 commits takes
+a couple of minutes.
+
+**You should see** at the end:
+
+```
+fcm_to_git: [107/107] r5863 -> 033a7d6  #233 - added the psyclone transformer to the repo directly
+fcm_to_git: done - 'um13.7_transformed_ukca_gpuport_nvtx_calipers' matches the FCM branch at r5863
+fcm_to_git: nothing has been pushed - review the commits (docs/05-review-and-push.md)
+```
+
+`done - ... matches the FCM branch` means the script has checked that the code
+on your git branch is exactly the same as the latest code on your FCM branch.
+
+If it stops before this, read the message it prints - it says what to do - and
+see [Troubleshooting: Step 4](troubleshooting.md#step-4---run-fcm_to_gitsh). It
+is always safe to run the command again: it carries on from where it stopped.
+
+Next: [step 5](05-review-and-push.md).
+
+## If your branch was made from another branch
+
+Most branches are made from trunk. If yours was made from someone else's
+branch - even if you did not know - the dry run shows a warning like this:
+
+```
+fcm_to_git: WARNING: this FCM branch was not made from trunk, but from another
+  branch. It was made from
+    /main/branches/dev/josephwallwork/um13.8_ukca_gpuport@5776
+  which was made from
+    /main/trunk@5509
+  The git branch must start from the nearest release:  START=um13.8
+  Its first commit then sets the code to /main/branches/dev/josephwallwork/um13.8_ukca_gpuport@5776.
+  That commit holds all the changes made on /main/branches/dev/josephwallwork/um13.8_ukca_gpuport
+  - not only yours - and they will show up in a pull request.
+```
+
+The other branch is not on GitHub, so your git branch cannot start from it.
+Instead, the script starts from the nearest release and adds one extra commit
+first, which brings the code to the point your branch was made. Your own
+commits follow.
+
+What to do:
+
+1. If `START` in your details file is not what the warning says (here
+   `um13.8`), change it, then delete your git branch and redo step 3:
+
+   **Run in:** your GitHub clone
+
+   ```bash
+   source ~/fcm_to_git_work/my_branch.sh
+   cd ~/fcm_to_git_work/github/ukca
+   git switch main
+   git branch -D "$BRANCH"
+   git switch -c "$BRANCH" "$START"
+   ```
+
+2. Run the dry run again. The list now starts with the extra commit:
+
+   ```
+     r5792  (first commit: code from /main/branches/dev/josephwallwork/um13.8_ukca_gpuport@5776)
+     r5794  #233 - removed psyclone processed files, ...
+   ```
+
+3. Run the script for real (4.2).
+
+That first commit contains the other branch's changes as well as yours. Before
+opening a pull request, talk to the owner of the other branch - their changes
+may need to go in first, or with yours.
+
+## What the script does
+
+1. Lists the revisions of your FCM branch. The first one is the copy from
+   trunk that created the branch; the rest are your commits.
+2. Checks out your FCM branch, as it was when created, into a temporary
+   folder, and checks that the git branch holds exactly the same code. If not,
+   it stops without changing anything - the git branch was started from the
+   wrong place.
+3. For each of your FCM revisions:
+   - updates the temporary checkout to that revision
+   - copies it into your GitHub clone, as in the Met Office guide:
+     `rsync -a --delete --exclude=.git --exclude=.svn`
+   - commits it with the original message
+4. Checks your git branch now holds exactly the same code as the latest
+   revision of your FCM branch.
+
+If you add more commits to your FCM branch later, running the script again
+copies just the new ones.
+
+## What the commit messages look like
+
+Each commit message is your FCM message. It starts with `fcm_to_git` and the
+original revision, author and date (UTC), and ends with the full details of
+the original FCM commit:
+
+```
+fcm_to_git [r5465 robertwaters 2025-02-18 09:11]: Reverted back to r5460 - added back in openmp
 
 Custom merge into /main/branches/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers: r5453 cf. r5460 of /main/branches/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers@5464
 
@@ -41,81 +169,7 @@ FCM-Author: robertwaters
 FCM-Date: 2025-02-18T09:11:54Z
 ```
 
-The git author is you (from `git config user.name` / `user.email`); the author
-date is the date of the original SVN commit.
-
-## Before you run it
-
-- You have the git branch from [step 3](03-create-github-branch.md) checked out,
-  with no uncommitted changes.
-- `svn` works and can reach MOSRS (try `svn info <branch URL>`).
-- Your git name and email are set: `git config user.name` and
-  `git config user.email`.
-- `rsync` is installed.
-
-## Run it
-
-First do a dry run (`-n`). It lists the revisions that would be copied, without
-changing anything:
-
-```bash
-/path/to/fcm_to_git/fcm_to_git.sh -n <FCM branch URL or working copy> <git clone>
-```
-
-For the example branch:
-
-```bash
-cd ~/ukca    # your clone, on the branch from step 3
-/path/to/fcm_to_git/fcm_to_git.sh -n \
-  https://code.metoffice.gov.uk/svn/ukca/main/branches/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers .
-```
-
-```
-fcm_to_git: FCM branch:  https://code.metoffice.gov.uk/svn/ukca/main/branches/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers
-fcm_to_git: git branch:  um13.7_transformed_ukca_gpuport_nvtx_calipers (/home/jbloggs/ukca)
-fcm_to_git: created at:  r5373
-fcm_to_git: to convert:  107 of 107 revisions
-  r5376  Asad code is now version that comes out of psyclone
-  r5382  Issue with local char var resolved by upgrading the latest copy of Psyclone
-  ...
-```
-
-Then run it for real by dropping `-n`:
-
-```bash
-/path/to/fcm_to_git/fcm_to_git.sh \
-  https://code.metoffice.gov.uk/svn/ukca/main/branches/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers .
-```
-
-```
-fcm_to_git: checking out r5373 ...
-fcm_to_git: [1/107] r5376 -> 1e442b5  Asad code is now version that comes out of psyclone
-fcm_to_git: [2/107] r5382 -> 6ba7648  Issue with local char var resolved by upgrading the latest copy of Psyclone
-...
-fcm_to_git: [107/107] r5863 -> 096766b  #233 - added the psyclone transformer to the repo directly
-fcm_to_git: done - 'um13.7_transformed_ukca_gpuport_nvtx_calipers' matches the FCM branch at r5863
-fcm_to_git: nothing has been pushed - review the commits (docs/05-review-and-push.md)
-```
-
-The example branch (107 revisions) takes about two minutes.
-
-## If it stops part way
-
-Just run it again. It finds the last revision already copied (from the
-`FCM-Revision:` line) and carries on from the next one. If you commit more to
-the FCM branch later, running it again copies only the new revisions.
-
-## If it says the branch does not match
-
-```
-fcm_to_git: ERROR: git branch '...' does not match the FCM branch at r5373.
-```
-
-The git branch was not created from the code your FCM branch started from.
-Check the `Branch Parent` revision ([step 1](01-checkout-fcm-branch.md)),
-delete the git branch and create it again ([step 3](03-create-github-branch.md)):
-
-```bash
-git switch main
-git branch -D <branch>
-```
+The git commit itself is made by you (your git name and email), dated when
+you ran the script. The original FCM author and date are kept in the message.
+The script uses the `FCM-URL` and `FCM-Revision` lines to know where to carry
+on if it is run again - do not edit them.

@@ -1,123 +1,184 @@
 # 1. Check out your FCM branch and find its version
 
-Before converting, you need a local copy (working copy) of your FCM branch, and
-you need to know roughly which release it is based on, e.g. `um13.7`. That
-release is the GitHub tag your branch will be rebuilt on (see
-[step 2](02-fork-and-tags.md)).
+In this step you:
 
-Run these on a machine where `fcm` works and you can reach the Met Office
-Science Repository Service (MOSRS).
+- get an up-to-date copy (checkout) of your FCM branch
+- find where your branch started - a release such as `um13.7`, or a trunk
+  revision such as r5137
+- write both into your details file
 
-## Step 1 - Check out your branch
+The example branch used throughout this guide is
+`um13.7_transformed_ukca_gpuport_nvtx_calipers` - use your own branch instead.
 
-Use either the FCM keyword:
+Problems? See [Troubleshooting: Step 1](troubleshooting.md#step-1---check-out-your-fcm-branch).
+
+## 1.1 Check out your branch
+
+First make sure `fcm` can log in to MOSRS (see
+[step 0](00-before-you-start.md#check-your-machine-is-ready)):
+
+**Run in:** anywhere
 
 ```bash
+mosrs-cache-password
+```
+
+If you do not know your branch's exact name, list your branches (replace
+`robertwaters` with your MOSRS username):
+
+**Run in:** anywhere
+
+```bash
+fcm ls fcm:ukca.x_br/dev/robertwaters
+```
+
+Then check it out into `~/fcm_to_git_work/fcm`. Either with the FCM keyword:
+
+**Run in:** `~/fcm_to_git_work/fcm`
+
+```bash
+cd ~/fcm_to_git_work/fcm
 fcm co fcm:ukca.x_br/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers
 ```
 
-or the full URL:
+or with the full address - both do the same:
 
 ```bash
+cd ~/fcm_to_git_work/fcm
 fcm co https://code.metoffice.gov.uk/svn/ukca/main/branches/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers/
 ```
 
-Both give the same thing: a directory named after the branch. If you already
-have a working copy, bring it up to date and make sure all your changes are
-committed to FCM first:
+This makes a folder named after your branch, e.g.
+`~/fcm_to_git_work/fcm/um13.7_transformed_ukca_gpuport_nvtx_calipers`.
+
+## 1.2 Make sure everything is committed to FCM
+
+The conversion copies what is **committed on MOSRS** - not files you have only
+changed on your computer. Check for uncommitted changes:
+
+**Run in:** your FCM checkout
 
 ```bash
-cd um13.7_transformed_ukca_gpuport_nvtx_calipers
-fcm update
+cd ~/fcm_to_git_work/fcm/um13.7_transformed_ukca_gpuport_nvtx_calipers
 fcm status
 ```
 
-`fcm status` should print nothing. Anything it lists is not on FCM and will not
-be converted.
+**You should see:** nothing at all.
 
-Note the path to this directory - you will need it later.
+If it lists files, see
+[Troubleshooting: `fcm status` lists files](troubleshooting.md#fcm-status-lists-files).
 
-## Step 2 - Find the version your branch is based on
+## 1.3 Fill in your branch address
 
-### The quick answer: the branch name
-
-By convention, FCM branch names start with the release they were made from:
-
-```
-um13.7_transformed_ukca_gpuport_nvtx_calipers
-^^^^^^
-```
-
-This is usually right, but not always - the branch may have been made from a
-different revision, or later updated from trunk. Check it with the next step.
-
-### The reliable answer: `fcm branch-info`
-
-From inside your working copy:
+**Run in:** your FCM checkout
 
 ```bash
-fcm branch-info
+cd ~/fcm_to_git_work/fcm/um13.7_transformed_ukca_gpuport_nvtx_calipers
+fcm info
 ```
 
-For the example branch this prints (trimmed):
+**You should see** a line starting `URL:`, e.g.
 
 ```
 URL: https://code.metoffice.gov.uk/svn/ukca/main/branches/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers
-...
-Branch Create Rev: 5373
-...
-Branch Parent: https://code.metoffice.gov.uk/svn/ukca/main/trunk@4898
-Merges Avail From Parent: 7497 7479 7308 ...
-Merges Avail Into Parent: 5863 5796 5778 ...
 ```
 
-The line that matters is:
+Copy everything after `URL: ` into your details file
+(`~/fcm_to_git_work/my_branch.sh`), replacing the `CHANGE_ME` after `FCM_URL=`:
 
-| Line                         | Meaning                                                                   |
-|------------------------------|---------------------------------------------------------------------------|
-| `Branch Parent: ...@REV`     | The trunk revision your branch was created from - here **4898**           |
-| `Last Merge From Parent: ...`| Only present if you have merged trunk into your branch since creating it  |
+```bash
+FCM_URL=https://code.metoffice.gov.uk/svn/ukca/main/branches/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers
+```
 
-Use the `Branch Parent` revision: your git branch starts there, and your FCM
-commits are then brought across one by one on top of it. If there is a
-`Last Merge From Parent` line, your branch has also been updated from trunk
-since - those merges are commits on your branch and are brought across with
-the rest. (The `Merges Avail ...` lines list revisions not yet merged between
-trunk and your branch - ignore them.)
+No spaces around the `=`.
 
-### Turn the revision into a release
+## 1.4 Find where your branch started
 
-List the release keywords of the project and the trunk revision each one
-points at:
+Your branch name says where it started. FCM branch names begin with either a
+release or a trunk revision number:
+
+| Branch name starts with      | Started from                | Put in your details file |
+|------------------------------|-----------------------------|--------------------------|
+| A release, e.g. `um13.7_...` | the release `um13.7`        | `START=um13.7`           |
+| `r` and a number, e.g. `r5137_...` | trunk revision 5137   | leave `START=CHANGE_ME` for now - step 3.1 finds it |
+
+For the example branch, `um13.7_transformed_ukca_gpuport_nvtx_calipers`, that
+is:
+
+```bash
+START=um13.7
+```
+
+If your branch started from a revision number, write the number down (e.g.
+5137) - you need it in [step 3.1](03-create-github-branch.md#31-only-if-your-branch-name-starts-with-r-find-the-starting-commit).
+
+You do not need to double-check this: in step 4 the script compares the code
+at `START` with the start of your FCM branch, and stops without changing
+anything if they differ. It also spots branches made from another branch
+rather than from trunk, and tells you what to do.
+
+### If your branch name starts with neither
+
+Find where it started with `fcm branch-info`:
+
+**Run in:** your FCM checkout
+
+```bash
+cd ~/fcm_to_git_work/fcm/<your branch name>
+fcm branch-info
+```
+
+Look for the `Branch Parent:` line, e.g.
+
+```
+Branch Parent: https://code.metoffice.gov.uk/svn/ukca/main/trunk@4898
+```
+
+The number after `trunk@` is the trunk revision your branch started from -
+here 4898. To see if that is a release:
+
+**Run in:** anywhere
 
 ```bash
 fcm keyword-print fcm:ukca.x
 ```
 
-For UKCA:
-
 ```
 revision[ukca.x:um13.6] = 4075
 revision[ukca.x:um13.7] = 4898
 revision[ukca.x:um13.8] = 5509
-revision[ukca.x:um13.9] = 6356
 ...
 ```
 
-Your version is the **latest release at or before** your revision. The example
-branch parent is r4898, which is exactly `um13.7`.
+If your number is in the list, use that release (here `START=um13.7`).
+Otherwise treat it like a branch starting with `r` and that number.
 
-If your revision lies between two releases (e.g. r5000), your branch is not
-based on a release. That is fine - write down the revision instead, and use
-route B in [step 3](03-create-github-branch.md).
+If `Branch Parent` does **not** end in `/trunk@<number>` - e.g. it is
+`.../branches/dev/josephwallwork/um13.8_ukca_gpuport@5776` - your branch was
+made from someone else's branch. That is fine: in step 4 the script spots this
+and tells you which `START` to use - see
+[step 4](04-convert-commits.md#if-your-branch-was-made-from-another-branch).
 
-## Step 3 - Write it down
+## 1.5 Check your details file
 
-Before moving on, note:
+Save the file, then:
 
-- the path to your working copy
-- the branch URL (`fcm info` prints it as `URL:`)
-- the `Branch Parent` revision, and the release it matches if any (e.g. `um13.7`)
+**Run in:** anywhere
 
-On GitHub, the matching tag has the same name (e.g. `um13.7`). In
-[step 2](02-fork-and-tags.md), check that this tag is on your fork.
+```bash
+source ~/fcm_to_git_work/my_branch.sh
+echo "$FCM_URL"
+echo "$BRANCH"
+echo "$START"
+```
+
+**You should see** your branch address, your branch name and your release
+(or `CHANGE_ME` if your branch name starts with `r`), e.g.
+
+```
+https://code.metoffice.gov.uk/svn/ukca/main/branches/dev/robertwaters/um13.7_transformed_ukca_gpuport_nvtx_calipers
+um13.7_transformed_ukca_gpuport_nvtx_calipers
+um13.7
+```
+
+Next: [step 2](02-fork-and-tags.md).

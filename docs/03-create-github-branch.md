@@ -1,86 +1,91 @@
 # 3. Create a GitHub branch for your work
 
-Your FCM branch now needs a git branch to land on. It must start from exactly
-the code your FCM branch started from, so that the only differences are your
-own changes.
+In this step you make a new branch in your GitHub clone, starting from exactly
+the code your FCM branch started from. Step 4 then adds your commits to it.
 
-All commands are run in the clone of your fork from
-[step 2](02-fork-and-tags.md).
+The branch is only on your computer until step 5 - nothing goes to GitHub in
+this step.
 
-There are two routes:
+Problems? See [Troubleshooting: Step 3](troubleshooting.md#step-3---create-the-github-branch).
 
-- **A - your revision is a release** (from [step 1](01-checkout-fcm-branch.md),
-  e.g. `um13.7`): branch from the matching tag.
-- **B - your revision is not a release** (e.g. your branch parent lies between
-  two releases): branch from the git commit that matches your SVN revision.
+**Do not** start your branch from `main`. `main` has changes made since the
+move to GitHub that your FCM branch has never seen. Bringing your branch up to
+date with `main` comes after the move.
 
-Either way, **do not branch from `main`**. `main` contains changes made since
-the move to GitHub (new `.github/` workflows, `README.md`, `dependencies.yaml`,
-...) that your FCM branch has never seen. Updating to `main` comes later.
+## 3.1 Only if your branch name starts with `r`: find the starting commit
 
-## Choose a branch name
+**Skip to 3.2 if your branch name starts with a release** (e.g. `um13.7_...`) -
+you already set `START` in step 1.
 
-Using the FCM branch name keeps the link between the two obvious:
+If it starts with a revision, e.g. `r5137_...`, your branch started from trunk
+at that revision. Every FCM trunk revision up to the move to GitHub is also a
+git commit, so you can find the matching one.
 
-```bash
-BRANCH=um13.7_transformed_ukca_gpuport_nvtx_calipers
-```
+Replace `5137` below with the number from your branch name, then run:
 
-## Route A - Branch from the tag
+**Run in:** your GitHub clone
 
 ```bash
-git fetch upstream --tags
-git switch -c $BRANCH um13.7
+cd ~/fcm_to_git_work/github/ukca
+REV=5137
+git log --format='commit %H%n%b' git_migration \
+  | awk -v rev="$REV" '/^commit /{h=$2} /git-svn-id:/{split($2, a, "@"); if (a[2] + 0 <= rev) {print h; exit}}'
 ```
 
-Replace `um13.7` with your release.
+**You should see** one long code (a commit hash), e.g.
+`30396c7949cbad0cdd7862b0469c2ffdb4f555f1`. This is the last trunk commit at or before your revision.
 
-## Route B - Branch from the matching commit
-
-Every SVN trunk revision up to the move to GitHub is a commit in git, and each
-of those commits records the revision it came from in its message:
-
-```
-git-svn-id: https://metomi/svn/ukca.xm/main/trunk@4898 38b0f608-...
-```
-
-Your `Branch Parent` revision from [step 1](01-checkout-fcm-branch.md) may not
-be a revision where trunk itself changed -
-e.g. `trunk@5000` when trunk last changed at r4898. Trunk at r5000 is the same
-code as trunk at r4898, so what you need is the **latest trunk commit at or
-before your revision**. This prints it:
+Copy it into your details file, replacing the `CHANGE_ME` after `START=`:
 
 ```bash
-REV=5000
-git log git_migration --format='%H %(trailers:key=git-svn-id,valueonly)' \
-  | awk -v rev=$REV 'NF {split($2, a, "@"); if (a[2] + 0 <= rev) {print $1; exit}}'
+START=30396c7949cbad0cdd7862b0469c2ffdb4f555f1
 ```
 
-Check it is the commit you expect:
+and save the file.
+
+## 3.2 Create the branch
+
+**Run in:** your GitHub clone
 
 ```bash
-git log -1 <hash>
+source ~/fcm_to_git_work/my_branch.sh
+cd ~/fcm_to_git_work/github/ukca
+git switch -c "$BRANCH" "$START"
 ```
 
-The last line shows the SVN revision, e.g. `.../main/trunk@4898`. Then create
-the branch from it:
+This makes a new branch named after your FCM branch, starting at `START`, and
+switches to it.
+
+**You should see:**
+
+```
+Switched to a new branch 'um13.7_transformed_ukca_gpuport_nvtx_calipers'
+```
+
+## 3.3 Check
+
+**Run in:** your GitHub clone
 
 ```bash
-git switch -c $BRANCH <hash>
+cd ~/fcm_to_git_work/github/ukca
+git status
 ```
 
-## Next
+**You should see** your branch name and that nothing has changed:
 
-The branch exists only in your local clone for now - do not push it yet.
-[Step 4](04-convert-commits.md) adds your FCM commits to it, and you push in
-[step 5](05-review-and-push.md) after reviewing them.
+```
+On branch um13.7_transformed_ukca_gpuport_nvtx_calipers
+nothing to commit, working tree clean
+```
+
+Next: [step 4](04-convert-commits.md).
 
 ## Background
 
-- These git tags and commits contain exactly the same code as SVN trunk at
-  the same revision. For UKCA this was checked for `um13.7` (r4898), `um13.9`
+- The tags and commits in git hold exactly the same code as FCM trunk at the
+  same revision. For UKCA this was checked for `um13.7` (r4898), `um13.9`
   (r6356) and `git_migration` (r7497).
-- The Met Office guide to branch migration is
-  [here](https://metoffice.github.io/simulation-systems/WorkingPractices/branch_migration.html).
-  It copies only the final state of your branch into git (one commit, no
-  history). Here we start from the same tagged code but keep your FCM commits.
+- The Met Office has its own
+  [branch migration guide](https://metoffice.github.io/simulation-systems/WorkingPractices/branch_migration.html).
+  It copies only the final state of your branch into git, as one commit. This
+  guide starts from the same code but keeps each of your FCM commits.

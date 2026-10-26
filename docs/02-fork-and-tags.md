@@ -1,178 +1,149 @@
-# 2. Fork the GitHub repository and bring across the tags
+# 2. Fork UKCA on GitHub and bring across the tags
 
-Before any FCM branch can be moved to GitHub you need your own **fork** of the
-upstream repository (e.g. [MetOffice/ukca](https://github.com/MetOffice/ukca)),
-and that fork must contain the upstream **tags**.
+In this step you:
+
+- make your fork - your own copy of UKCA on GitHub (see
+  [step 0](00-before-you-start.md#what-is-a-fork-and-why-do-i-need-one))
+- turn off GitHub Actions on it
+- clone it onto your computer
+- copy the release **tags** (e.g. `um13.7`) into your fork
+
+You only do this once. For your next branch, skip to
+[Keeping your fork up to date](#keeping-your-fork-up-to-date).
+
+Problems? See [Troubleshooting: Step 2](troubleshooting.md#step-2---fork-and-tags).
 
 ## Why the tags matter
 
-Every FCM branch was created from a release, e.g. `vn13.9` of the UM. On GitHub
-each of those releases is a tag (`um13.9`, `2025.12.1`, ...). When your branch
-is converted, it is rebuilt **on top of the matching tag**, so that only your
-changes appear in the history and in any pull request.
+A tag marks a release, e.g. `um13.7`. Your git branch will start from the tag
+of the release your FCM branch started from (step 1), so that the only
+differences are your own changes. Your fork must have that tag.
 
-If the tag is missing from your fork, there is nothing to build on, and the
-converted branch either fails or carries the whole code base as "your" change.
+GitHub does not always copy tags into a fork, and the **Sync fork** button on
+GitHub never does. So we copy them ourselves, in 2.5.
 
-GitHub does not reliably keep tags in a fork up to date:
+## 2.1 Create the fork on GitHub
 
-- A fork made with **"Copy the main branch only"** (the default) may not have
-  every tag.
-- The **"Sync fork"** button updates branches only - it never brings across
-  tags created upstream after you forked.
+In a web browser:
 
-So we always copy the tags across ourselves, as in step 5 below.
-
-## Placeholders used below
-
-| Placeholder | Meaning                         | Example     |
-|-------------|---------------------------------|-------------|
-| `<ORG>`     | Organisation owning the repo    | `MetOffice` |
-| `<REPO>`    | Repository name                 | `ukca`      |
-| `<USER>`    | Your GitHub username            | `jbloggs`   |
-
-The commands use SSH URLs (`git@github.com:...`). If you have not set up an SSH
-key with GitHub, use `https://github.com/...` instead.
-
-## Step 1 - Create the fork on GitHub
-
-1. Go to `https://github.com/<ORG>/<REPO>`.
+1. Go to <https://github.com/MetOffice/ukca> and log in.
 2. Click **Fork** (top right).
-3. Owner: your own account. Repository name: leave as `<REPO>`.
-4. Leave **"Copy the main branch only"** ticked - you do not need the other
-   upstream branches.
+3. **Owner:** your username. **Repository name:** leave as `ukca`.
+4. Leave **Copy the main branch only** ticked.
 5. Click **Create fork**.
 
-You now have `https://github.com/<USER>/<REPO>`.
+**You should see** your fork, at `https://github.com/<your username>/ukca`.
+Near the top left it says *forked from MetOffice/ukca*.
 
-## Step 2 - Disable GitHub Actions on your fork
+**If you already had a fork**, bring it up to date: on your fork's page, click
+**Sync fork** > **Update branch**. (If it says *This branch is up to date with
+MetOffice/ukca:main*, there is nothing to do.)
 
-Your fork contains the upstream workflows in `.github/workflows/`. These are
-meant to run on the official repository, not on your fork. Left enabled they
-can be triggered by your pushes - including pushing the tags in step 5 - and
-use up your Actions minutes, fail because the fork lacks upstream secrets, or
-send you failure emails.
+## 2.2 Turn off GitHub Actions on your fork
 
-Turn Actions off **before** pushing anything:
+UKCA has automatic checks (GitHub Actions) that run when code is pushed. They
+are meant for the official repository. On your fork they would run when you
+push, fail, and email you about it. Turn them off **before pushing anything**:
 
-1. Go to `https://github.com/<USER>/<REPO>/settings/actions`
-   (**Settings** > **Actions** > **General**).
-2. Under **Actions permissions**, select **Disable actions**.
+1. On your fork, click **Settings** (top bar) > **Actions** (left menu) >
+   **General**. (Or go to `https://github.com/<your username>/ukca/settings/actions`.)
+2. Under **Actions permissions**, choose **Disable actions**.
 3. Click **Save**.
 
-Or, with the [GitHub CLI](https://cli.github.com/):
+If the **Actions** tab of your fork shows a button *I understand my workflows,
+go ahead and enable them* - do **not** click it.
+
+## 2.3 Clone your fork onto your computer
+
+**Run in:** `~/fcm_to_git_work/github`
 
 ```bash
-gh api -X PUT repos/<USER>/<REPO>/actions/permissions -F enabled=false
-gh api repos/<USER>/<REPO>/actions/permissions
+source ~/fcm_to_git_work/my_branch.sh
+cd ~/fcm_to_git_work/github
+git clone "git@github.com:$GH_USER/ukca.git"
 ```
 
-The second command should print `"enabled":false`.
+**You should see** `Cloning into 'ukca'...` and a few progress lines. You now
+have the folder `~/fcm_to_git_work/github/ukca` - your clone.
 
-GitHub sometimes shows a fork's **Actions** tab with a button saying
-"I understand my workflows, go ahead and enable them". Do not click it.
+## 2.4 Link your clone to the official repository
 
-## Step 3 - Clone your fork
+Your clone already knows your fork, as `origin`. Add the official repository
+as `upstream`:
 
-```bash
-git clone git@github.com:<USER>/<REPO>.git
-cd <REPO>
-```
-
-## Step 4 - Add the upstream repository as a remote
+**Run in:** your GitHub clone
 
 ```bash
-git remote add upstream git@github.com:<ORG>/<REPO>.git
+cd ~/fcm_to_git_work/github/ukca
+git remote add upstream git@github.com:MetOffice/ukca.git
 git remote -v
 ```
 
-You should see two remotes:
+**You should see** four lines - `origin` is your fork, `upstream` is
+MetOffice:
 
 ```
-origin    git@github.com:<USER>/<REPO>.git (fetch)
-origin    git@github.com:<USER>/<REPO>.git (push)
-upstream  git@github.com:<ORG>/<REPO>.git (fetch)
-upstream  git@github.com:<ORG>/<REPO>.git (push)
+origin    git@github.com:RobWatersMet/ukca.git (fetch)
+origin    git@github.com:RobWatersMet/ukca.git (push)
+upstream  git@github.com:MetOffice/ukca.git (fetch)
+upstream  git@github.com:MetOffice/ukca.git (push)
 ```
 
-- `origin` - your fork. You push here.
-- `upstream` - the official repository. You only fetch from here.
+## 2.5 Copy the tags into your fork
 
-## Step 5 - Copy the tags from upstream to your fork
+**Run in:** your GitHub clone
 
 ```bash
+cd ~/fcm_to_git_work/github/ukca
 git fetch upstream --tags
 git push origin --tags
 ```
 
-The first command downloads every upstream tag into your local clone; the
-second uploads them to your fork. Tags that are already on your fork are
-skipped, so this is safe to repeat.
+The first command downloads all the tags from MetOffice to your computer; the
+second uploads them to your fork.
 
-> `git push origin --tags` pushes **all** tags in your local clone. In a fresh
-> clone these are only the upstream tags. If you have made your own local tags,
-> delete or rename them first so they do not end up on your fork.
+**You should see** lines like `* [new tag] um13.7 -> um13.7`. If your fork
+already had the tags, the second command just says `Everything up-to-date` -
+that is fine too.
 
-## Step 6 - Check the tags arrived
+## 2.6 Check your release tag is there
 
-Compare the tags on upstream with the tags on your fork - the two lists should
-be identical:
+**Run in:** your GitHub clone
 
 ```bash
-git ls-remote --tags upstream | sort > upstream_tags.txt
-git ls-remote --tags origin | sort > fork_tags.txt
-diff upstream_tags.txt fork_tags.txt && echo "All tags present"
+source ~/fcm_to_git_work/my_branch.sh
+cd ~/fcm_to_git_work/github/ukca
+git ls-remote --tags origin "$START"
 ```
 
-You can also look at `https://github.com/<USER>/<REPO>/tags`. Make sure the
-release your FCM branch was made from (found in
-[step 1](01-checkout-fcm-branch.md), e.g. `um13.7`) is there.
+**You should see** one line ending in your release, e.g.
+`10b52f1... refs/tags/um13.7`. If it prints nothing, see
+[Troubleshooting](troubleshooting.md#my-release-tag-is-not-on-my-fork).
 
-Remove the two `.txt` files afterwards.
+(If your branch name starts with `r`, `START` is still `CHANGE_ME` and this
+prints nothing - that is expected. Check `git_migration` instead:
+`git ls-remote --tags origin git_migration`.)
 
-## Keeping your fork up to date later
+You can also see all the tags in a browser at
+`https://github.com/<your username>/ukca/tags`.
 
-Upstream will add new releases and tags. Whenever you start new work, repeat
-step 5 (and optionally sync `main`):
+Next: [step 3](03-create-github-branch.md).
 
-```bash
-git fetch upstream --tags
-git push origin --tags
-git switch main
-git merge --ff-only upstream/main
-git push origin main
-```
+## Keeping your fork up to date
 
-## Alternative: the GitHub CLI
+MetOffice adds new releases over time. When you start on another branch:
 
-If you have [`gh`](https://cli.github.com/) installed and logged in, steps 1, 3
-and 4 are one command, which creates the fork, clones it and sets up `origin` and
-`upstream` for you:
+1. **Bring `main` up to date.** In a browser, go to your fork
+   (`https://github.com/<your username>/ukca`). If it says *This branch is
+   ... commits behind MetOffice/ukca:main*, click **Sync fork** >
+   **Update branch**.
+2. **Bring the new tags across.** **Sync fork** does not copy tags, so also
+   run (safe to repeat):
 
-```bash
-gh repo fork <ORG>/<REPO> --clone --remote
-```
+   **Run in:** your GitHub clone
 
-`gh` does not disable Actions or copy the tags, so then do step 2 (the
-`gh api` command there) and carry on from step 5:
-
-```bash
-cd <REPO>
-gh api -X PUT repos/<USER>/<REPO>/actions/permissions -F enabled=false
-```
-
-## Worked example: UKCA
-
-For the user `jbloggs`, after forking `MetOffice/ukca` on GitHub and
-disabling Actions on the fork:
-
-```bash
-git clone git@github.com:jbloggs/ukca.git
-cd ukca
-git remote add upstream git@github.com:MetOffice/ukca.git
-git fetch upstream --tags
-git push origin --tags
-git ls-remote --tags origin | grep um13.9
-```
-
-The last command should print the `um13.9` tag.
+   ```bash
+   cd ~/fcm_to_git_work/github/ukca
+   git fetch upstream --tags
+   git push origin --tags
+   ```

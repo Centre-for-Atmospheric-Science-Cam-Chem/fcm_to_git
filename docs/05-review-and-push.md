@@ -1,79 +1,134 @@
 # 5. Review the commits, then push
 
-After [step 4](04-convert-commits.md) your commits exist only in your local
-clone. Check them before anything goes to GitHub - until you push, everything
-can be thrown away and redone.
+After step 4 your commits are only on your computer. In this step you check
+them, then push them to your fork on GitHub.
 
-Set these to match your branch:
+Until you push, nothing is on GitHub - if something looks wrong you can throw
+the branch away and start again.
 
-```bash
-BRANCH=um13.7_transformed_ukca_gpuport_nvtx_calipers
-START=um13.7    # the tag or commit hash the branch was created from in step 3
-```
+Problems? See [Troubleshooting: Step 5](troubleshooting.md#step-5---review-and-push).
 
-## Check the commits
+## 5.1 Look at the list of commits
 
-List the new commits - one per FCM revision, oldest at the bottom:
+**Run in:** your GitHub clone
 
 ```bash
-git log --oneline $START..$BRANCH
+source ~/fcm_to_git_work/my_branch.sh
+cd ~/fcm_to_git_work/github/ukca
+git log --oneline "$START..$BRANCH"
 ```
 
-Count them. This should equal the number of revisions on your FCM branch,
-minus the one that created it (the `to convert` count from step 4):
+**You should see** one line per FCM commit, newest at the top, each starting
+with a short code, then `fcm_to_git` and the original FCM revision, author and
+date:
+
+```
+033a7d6 fcm_to_git [r5863 robertwaters 2025-04-02 10:18]: #233 - added the psyclone transformer to the repo directly
+8b9c7c4 fcm_to_git [r5796 robertwaters 2025-03-24 11:21]: #233 - undoing changes from Edingbugh - no longer needed
+3a1be0c fcm_to_git [r5778 robertwaters 2025-03-21 11:47]: revert to original, pre-psyclone1
+...
+```
+
+If the list is long it opens in a viewer: scroll with the arrow keys, and
+press `q` to get back.
+
+## 5.2 Count the commits
+
+**Run in:** your GitHub clone
 
 ```bash
-git rev-list --count $START..$BRANCH
+source ~/fcm_to_git_work/my_branch.sh
+cd ~/fcm_to_git_work/github/ukca
+git rev-list --count "$START..$BRANCH"
 ```
 
-Look at individual commits, e.g. the first and last:
+**You should see** the same number as **to convert** in the step 4 dry run,
+e.g. `107`. If your branch was made from another branch, add 1 for the extra
+first commit.
+
+## 5.3 Look at a commit
+
+To see what one commit changed, use its short code from 5.1:
+
+**Run in:** your GitHub clone
 
 ```bash
-git show --stat $BRANCH~0
-git log --reverse --format=%H $START..$BRANCH | head -1 | xargs git show --stat
+cd ~/fcm_to_git_work/github/ukca
+git show 033a7d6
 ```
 
-Compare any commit with the SVN revision it came from (the revision is on the
-`FCM-Revision:` line of the message):
+**You should see** the commit message with its `FCM-Revision:` line, then the
+changes (lines starting `-` were removed, `+` were added). Press `q` to get
+back.
+
+To compare with FCM, show the same revision there (use the number from the
+`FCM-Revision:` line):
+
+**Run in:** anywhere
 
 ```bash
-git show <hash>
-svn diff -c <revision> <FCM branch URL>
+source ~/fcm_to_git_work/my_branch.sh
+svn diff -c 5863 "$FCM_URL"
 ```
 
-## Check the total change
+The changes should be the same.
 
-Everything your branch changes compared with where it started:
+## 5.4 Look at everything your branch changes
+
+**Run in:** your GitHub clone
 
 ```bash
-git diff --stat $START $BRANCH
+source ~/fcm_to_git_work/my_branch.sh
+cd ~/fcm_to_git_work/github/ukca
+git diff --stat "$START" "$BRANCH"
 ```
 
-This should look like your FCM branch's changes, and nothing else - compare
-with `fcm diff -b` in your FCM working copy.
+**You should see** the files your branch changes, and a summary line such as
+`70 files changed, 27718 insertions(+), 27902 deletions(-)`. These should be
+your changes and nothing else.
 
-## If something is wrong
-
-Nothing is on GitHub yet, so delete the branch and start again from
-[step 3](03-create-github-branch.md):
-
-```bash
-git switch main
-git branch -D $BRANCH
-```
-
-## Push
+## 5.5 Push to your fork
 
 When you are happy:
 
+**Run in:** your GitHub clone
+
 ```bash
-git push -u origin $BRANCH
+source ~/fcm_to_git_work/my_branch.sh
+cd ~/fcm_to_git_work/github/ukca
+git push -u origin "$BRANCH"
 ```
 
-This pushes to **your fork** (`origin`), not to the upstream repository.
-`-u` links your local branch to the one on your fork, so later you can just run
-`git push`. The branch is then at
-`https://github.com/<USER>/<REPO>/tree/<BRANCH>`.
+This sends your branch to **your fork** (`origin`) - not to MetOffice.
 
-Check on GitHub that the commits are there. GitHub Actions should not run,
-because they were disabled on your fork in [step 2](02-fork-and-tags.md).
+**You should see** some progress lines, ending with
+
+```
+ * [new branch]      um13.7_transformed_ukca_gpuport_nvtx_calipers -> um13.7_transformed_ukca_gpuport_nvtx_calipers
+branch 'um13.7_transformed_ukca_gpuport_nvtx_calipers' set up to track 'origin/um13.7_transformed_ukca_gpuport_nvtx_calipers'.
+```
+
+## 5.6 Check on GitHub
+
+In a browser, go to `https://github.com/<your username>/ukca`, click the
+branch menu (it says `main`, top left) and choose your branch. Click the
+commit count (clock icon) to see your commits.
+
+Your branch is now on GitHub, with its full history.
+
+## If something looks wrong
+
+**Before pushing:** delete the branch and start again from
+[step 3](03-create-github-branch.md):
+
+**Run in:** your GitHub clone
+
+```bash
+source ~/fcm_to_git_work/my_branch.sh
+cd ~/fcm_to_git_work/github/ukca
+git switch main
+git branch -D "$BRANCH"
+```
+
+**After pushing:** it is only on your fork, so you can remove it there too -
+see [Troubleshooting](troubleshooting.md#i-pushed-and-want-to-start-again).
