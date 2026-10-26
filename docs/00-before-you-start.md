@@ -149,7 +149,7 @@ Everything goes in one folder, `~/fcm_to_git_work`:
 ```bash
 mkdir -p ~/fcm_to_git_work/github
 cd ~/fcm_to_git_work
-git clone git@github.com:RobWatersMet/fcm_to_git.git
+git clone git@github.com:Centre-for-Atmospheric-Science-Cam-Chem/fcm_to_git.git
 cp fcm_to_git/my_branch_template.sh my_branch.sh
 ```
 
