@@ -95,6 +95,14 @@ added to your GitHub account - follow
 [Connecting to GitHub with SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh).
 Then run `ssh -T git@github.com` again.
 
+### `ssh -T git@github.com` hangs, or says `Connection timed out`
+
+SSH to GitHub is blocked on this machine - e.g. on **Monsoon**, where it is
+not available at all. Press `Ctrl+C` to stop a hanging command. This guide
+needs SSH, so either do the migration on another machine where both `fcm` and
+SSH to GitHub work, or use HTTPS with a token - see
+[If SSH to GitHub does not work](00-before-you-start.md#if-ssh-to-github-does-not-work-eg-monsoon).
+
 ### `ssh -T git@github.com` says `Are you sure you want to continue connecting (yes/no)?`
 
 Normal the first time. Type `yes` and press Enter.
