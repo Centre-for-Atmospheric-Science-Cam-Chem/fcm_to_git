@@ -27,6 +27,30 @@ fcm_to_git [r5973 robertwaters 2025-04-22 14:44]: #233 - added nvtx calipers to 
   into the first GitHub release, on a copy of your branch, so you can carry on
   developing it on GitHub.
 
+## Releases and tags
+
+Releases are marked by git **tags**. On FCM they were named after UM
+versions (`um13.9`, `vn13.9`); on GitHub they are named by date
+(`2025.12.1` = December 2025). Every date-named release comes **after**
+every FCM one, and each release contains everything before it:
+
+| | UKCA | UM | LFRic Apps |
+|---|---|---|---|
+| Last FCM releases | `um13.8`, `um13.9` (Jun 2025) | `vn13.8`, `vn13.9` (Jun 2025) | `vn2.1`, `vn2.2` (Jul 2025) |
+| Last FCM trunk, not a release | `git_migration` (Oct 2025) | `git_migration` (Oct 2025) | `git_migration` (Nov 2025) |
+| **First GitHub release** | `2025.12.1` | `2025.12.1` = `vn14.0` | `2025.12.1` = `vn3.0` |
+| | `2026.03.1` = `2026.03.2` | `2026.03.2` = `vn14.1` | `2026.03.1` = `vn3.1` |
+| | `2026.07.1` | `2026.07.1` = `vn14.2` | `2026.07.1` = `vn3.2` |
+
+- Your FCM branch starts from one of the FCM tags (steps 1 and 3).
+- The optional step 6 merges in `2025.12.1`, the first GitHub release - e.g.
+  only 22 commits after `um13.9` in UKCA.
+- The same date tag goes together across repositories: the UM's `2025.12.1`
+  uses UKCA `2025.12.1`. UKCA has no `um14.x` names - `2025.12.1` is the UKCA
+  that goes with UM `vn14.0`.
+- `stable` is a branch that always points at the latest release (in October
+  2026: `2026.07.1` for UKCA and the UM, `2026.07.2` for LFRic Apps).
+
 ## Guide
 
 0. [Before you start](docs/00-before-you-start.md) - what forks, clones and
