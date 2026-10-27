@@ -62,6 +62,8 @@ GitHub:  tag um13.7  ──> your branch: one commit per FCM revision
    the `fcm_to_git.sh` script does this.
 5. [Review the commits, then push](05-review-and-push.md) - check, then send
    to your fork on GitHub.
+6. *Optional:* [Bring your branch up to the first GitHub release](06-merge-first-release.md) -
+   only if you want to carry on developing your branch on GitHub.
 
 ## What you need
 
@@ -70,7 +72,13 @@ GitHub:  tag um13.7  ──> your branch: one commit per FCM revision
 - A **GitHub account**, with an **SSH key** added to it, so that the machine
   can talk to GitHub. If you have not done this, follow GitHub's guide:
   [Connecting to GitHub with SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh).
+  On **Monsoon**, SSH to GitHub is blocked - see
+  [If SSH to GitHub does not work](#if-ssh-to-github-does-not-work-eg-monsoon).
 - About 30 minutes for the first branch.
+- Only for the optional step 6: [VS Code](https://code.visualstudio.com/),
+  which makes fixing merge conflicts much easier. If your machine is remote,
+  use it with the
+  [Remote - SSH](https://code.visualstudio.com/docs/remote/ssh) extension.
 
 ## Check your machine is ready
 
@@ -113,12 +121,15 @@ prints some lines starting with `Path:`, `URL:`... If it says
 `Authentication failed`, run `mosrs-cache-password` again.
 
 ```bash
-ssh -T git@github.com
+ssh -o ConnectTimeout=10 -T git@github.com
 ```
 
 prints `Hi <your GitHub username>! You've successfully authenticated, but
 GitHub does not provide shell access.` (The first time, it asks
-`Are you sure you want to continue connecting?` - type `yes`.)
+`Are you sure you want to continue connecting?` - type `yes`.) If instead it
+says `Connection timed out` after 10 seconds, SSH to GitHub is blocked on
+this machine - see
+[If SSH to GitHub does not work](#if-ssh-to-github-does-not-work-eg-monsoon).
 
 ```bash
 git config user.name
@@ -132,6 +143,18 @@ your GitHub account so your commits are linked to you:
 git config --global user.name "Robert Waters"
 git config --global user.email "robert.waters@example.ac.uk"
 ```
+
+## If SSH to GitHub does not work (e.g. Monsoon)
+
+This guide uses SSH to talk to GitHub. Some machines block it - on
+**Monsoon** (including Monsoon3) SSH to GitHub is not available at all, and
+`ssh -T git@github.com` hangs or times out.
+
+There you have to use **HTTPS with a GitHub personal access token** instead.
+This guide does not cover that yet - see the Met Office's
+[GitHub authorisation guide](https://metoffice.github.io/simulation-systems/WorkingPractices/gh_authorisation.html),
+or ask for help. If you can, do the migration on another machine where both
+`fcm` and SSH to GitHub work.
 
 ## Set up your folders
 
