@@ -73,6 +73,10 @@ GitHub:  tag um13.7  ──> your branch: one commit per FCM revision
   can talk to GitHub. If you have not done this, follow GitHub's guide:
   [Connecting to GitHub with SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh).
 - About 30 minutes for the first branch.
+- Only for the optional step 6: [VS Code](https://code.visualstudio.com/),
+  which makes fixing merge conflicts much easier. If your machine is remote,
+  use it with the
+  [Remote - SSH](https://code.visualstudio.com/docs/remote/ssh) extension.
 
 ## Check your machine is ready
 

@@ -118,7 +118,7 @@ The rest of this step works on the copy.
 source ~/fcm_to_git_work/my_branch.sh
 cd "$GH_CLONE"
 git fetch upstream --tags
-git merge --no-edit "$MERGE_TAG"
+git merge -m "Update to $MERGE_TAG" "$MERGE_TAG"
 ```
 
 There are two possible results.
@@ -171,7 +171,79 @@ file that merged without problems.)
 If there are more than you want to deal with, you can stop here - see
 [Changed your mind?](#changed-your-mind).
 
-### Fix each file
+### Which side to keep?
+
+Each conflict has two sides:
+
+- **Your branch** (called *current* or *ours*).
+- **The release** (called *incoming* or *theirs*), e.g. `2025.12.1`.
+
+A good rule:
+
+- **In files you have not worked on in your development**, take the
+  release's version. A conflict can be in such a file because your branch
+  touched it along the way - e.g. through an earlier trunk merge, or an edit
+  you later undid.
+- **In files you have worked on**, look carefully. Usually you need both: the
+  release's changes *and* yours. If you are unsure, ask someone who knows
+  that code.
+
+To see whether you worked on a file, list your FCM commits that changed it:
+
+**Run in:** your GitHub clone
+
+```bash
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
+git log --oneline "$START..$BRANCH" -- path/to/file
+```
+
+If the commits listed are your development work, it is your file. If none
+are, or they are only trunk merges, take the release's version.
+
+### Fix each file - with VS Code (recommended)
+
+[VS Code](https://code.visualstudio.com/) makes this much easier. Open your
+clone in it:
+
+**Run in:** your GitHub clone
+
+```bash
+source ~/fcm_to_git_work/my_branch.sh
+code "$GH_CLONE"
+```
+
+(If your clone is on a remote machine, connect to it with VS Code's
+[Remote - SSH](https://code.visualstudio.com/docs/remote/ssh) extension
+instead, then **File > Open Folder** and choose your clone.)
+
+1. Open **Source Control** (the branch icon in the left-hand bar, or
+   `Ctrl+Shift+G`). The files with conflicts are listed under
+   **Merge Changes**.
+2. Click a file. Each conflict is highlighted in colour, with links above it:
+
+   **Accept Current Change | Accept Incoming Change | Accept Both Changes |
+   Compare Changes**
+
+   *Current* is your branch; *incoming* is the release.
+3. For each conflict, pick one, following the rule above:
+   - **Accept Incoming Change** - take the release's version. Use this in
+     files you have not worked on.
+   - **Accept Current Change** - keep your version.
+   - **Accept Both Changes** - keep both, then tidy up by hand. Often right
+     in files you have worked on.
+
+   To take one side for a **whole file** at once, press `Ctrl+Shift+P` and
+   choose **Merge Conflict: Accept All Incoming** (or
+   **Merge Conflict: Accept All Current**).
+4. Save the file (`Ctrl+S`), then click the **+** next to it in Source
+   Control to mark it as fixed (the same as `git add`).
+
+For files deleted in the release, see
+[A file deleted on trunk](#a-file-deleted-on-trunk) below - they need a
+command in the terminal (VS Code has one: **Terminal > New Terminal**).
+
+### Fix each file - without VS Code
 
 Open each file in your editor and search for `<<<<<<<`. Each conflict looks
 like this:
@@ -196,7 +268,7 @@ cd "$GH_CLONE"
 git add path/to/the/file.F90
 ```
 
-**Whole-file shortcuts.** If you know you want one side for a whole file:
+**Whole-file shortcuts.** If you want one side for a whole file:
 
 ```bash
 git checkout --ours path/to/file      # keep your branch's version
@@ -204,7 +276,9 @@ git checkout --theirs path/to/file    # take the release's version
 git add path/to/file
 ```
 
-**A file deleted on trunk.** A conflict can also say e.g.
+### A file deleted on trunk
+
+A conflict can also say e.g.
 
 ```
 CONFLICT (modify/delete): rose-stem/site/meto/groups.rc deleted in 2025.12.1 and modified in HEAD.
@@ -215,7 +289,9 @@ something else, so delete it too (`git rm path/to/file`), and if your change
 is still needed, make it in the replacement. If your branch really still needs
 the file, keep it (`git add path/to/file`).
 
-**Test suite files (`.rc` and `.cylc`).** Many `rose-stem` files were renamed
+### Test suite files and LFRic Apps
+
+**`.rc` and `.cylc` files.** Many `rose-stem` files were renamed
 from `.rc` to `.cylc`. Git usually follows the rename, so a conflict can show
 up in the new `.cylc` file (e.g. `tasks-ex1a.cylc` above) - fix it as usual.
 Where the old `.rc` file was replaced rather than renamed, you get a "deleted"
@@ -239,6 +315,10 @@ git grep -n -e '^<<<<<<< ' -e '^>>>>>>> '
 **You should see:** nothing from either command. The first lists files not
 yet marked as fixed; the second finds any conflict markers left in the code.
 
+In VS Code you can check too: **Merge Changes** in Source Control should be
+empty, and searching all files (`Ctrl+Shift+F`) for `<<<<<<<` should find
+nothing.
+
 ### Finish the merge
 
 **Run in:** your GitHub clone
@@ -246,11 +326,10 @@ yet marked as fixed; the second finds any conflict markers left in the code.
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
 cd "$GH_CLONE"
-git commit --no-edit
+git commit --no-edit --cleanup=strip
 ```
 
-This makes the merge commit, with the message
-`Merge tag '2025.12.1' into <your branch>`.
+This makes the merge commit, with the message `Update to 2025.12.1`.
 
 ### Changed your mind?
 
@@ -314,9 +393,30 @@ git add dependencies.yaml
 git commit -m "Pin dependencies for $MERGE_TAG"
 ```
 
-## 6.5 Check and push
+## 6.5 Test your branch
 
-Check your branch builds and its tests run before pushing.
+**Testing is up to you** - only you know what your changes do and how to
+check them. (Steps 1 to 5 need no testing: the script checks your migrated
+branch is exactly the same code as your FCM branch. Only this step changes
+code.)
+
+Some suggestions:
+
+1. **Check it builds.**
+2. **Run what you ran before.** Whatever you used to check this work on FCM -
+   your own suite, a test case, a box model run - run it on both your
+   migrated branch (the old release) and this copy (the new release), and
+   compare. Differences should be explained by the release, not by your
+   changes going missing.
+3. **Run rose stem if your site can.** If your machine can run the GitHub
+   test suite for this repository, run it - see the Met Office
+   [testing guide](https://metoffice.github.io/simulation-systems/Development/testing.html).
+   The test suites often do not cover research changes, so this is not a
+   replacement for 2.
+4. **Do not rely on the copy until it runs.** You can still push it in 6.6 -
+   e.g. to back it up - but it is not finished until it does.
+
+## 6.6 Push
 
 Look at the result - your commits are at the top, and below them the merge
 and your FCM commits (`--first-parent` hides the trunk commits the merge

@@ -155,6 +155,23 @@ Trust `Branch Parent` - branch names are only a convention.
 
 ## Step 2 - Fork and tags
 
+### `fatal: 'upstream' does not appear to be a git repository`
+
+Your clone is not linked to the official MetOffice repository - step 2.4 was
+not done in this clone (e.g. you cloned it again later). Any command with
+`upstream` in it fails until you add the link:
+
+```bash
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
+git remote add upstream "git@github.com:MetOffice/$REPO_NAME.git"
+git remote -v
+```
+
+`git remote -v` should then show `upstream` as well as `origin` - see
+[2.4](02-fork-and-tags.md#24-link-your-clone-to-the-official-repository).
+Then run the command that failed again.
+
 ### GitHub says I already have a fork
 
 Fine - GitHub takes you to your existing fork. Carry on from 2.2, and make
@@ -508,7 +525,7 @@ them somewhere safe first.
 ### `You have not concluded your merge (MERGE_HEAD exists)` / `you have unmerged files`
 
 A merge is still in progress. Either finish it (fix the conflicts, `git add`
-the files, then `git commit --no-edit` - see
+the files, then `git commit --no-edit --cleanup=strip` - see
 [6.3](06-merge-first-release.md#63-fix-the-conflicts)) or cancel it with
 `git merge --abort`.
 

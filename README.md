@@ -5,6 +5,28 @@ Moves your UKCA branch from FCM (MOSRS) to your fork on GitHub, keeping every
 commit. No git knowledge needed - each step gives the commands to run, where to
 run them, and what you should see.
 
+## What you end up with
+
+Your branch on GitHub, with every FCM commit, newest at the top - e.g. for
+`robertwaters/r5776_ukca_gpuport_nvtx_calipers`:
+
+```
+Update to 2025.12.1
+fcm_to_git [r6002 robertwaters 2025-04-23 16:17]: #233 - typo
+fcm_to_git [r5999 robertwaters 2025-04-23 16:01]: #233 - adding more nvtx to help understand the poor ftoy performance
+fcm_to_git [r5978 robertwaters 2025-04-22 16:13]: #233 - more calipers
+fcm_to_git [r5974 robertwaters 2025-04-22 14:54]: #233 - typo
+fcm_to_git [r5973 robertwaters 2025-04-22 14:44]: #233 - added nvtx calipers to asad chemistry code
+...
+```
+
+- Each `fcm_to_git [...]` commit is one of your FCM commits (steps 1 to 5),
+  with its original revision, author, date and message. The code at each one
+  is exactly the code on FCM at that revision.
+- `Update to 2025.12.1` at the top is the optional step 6: your work merged
+  into the first GitHub release, on a copy of your branch, so you can carry on
+  developing it on GitHub.
+
 ## Guide
 
 0. [Before you start](docs/00-before-you-start.md) - what forks, clones and
