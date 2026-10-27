@@ -237,7 +237,9 @@ instead, then **File > Open Folder** and choose your clone.)
    choose **Merge Conflict: Accept All Incoming** (or
    **Merge Conflict: Accept All Current**).
 4. Save the file (`Ctrl+S`), then click the **+** next to it in Source
-   Control to mark it as fixed (the same as `git add`).
+   Control to mark it as fixed (the same as `git add`). If you change the
+   file again after that, it shows up under **Changes** - click its **+**
+   again, or the new change is left out of the merge.
 
 For files deleted in the release, see
 [A file deleted on trunk](#a-file-deleted-on-trunk) below - they need a
@@ -308,16 +310,18 @@ delete it too (`git rm dependencies.sh`) - it is replaced by
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
 cd "$GH_CLONE"
-git diff --name-only --diff-filter=U
+git diff --name-only
 git grep -n -e '^<<<<<<< ' -e '^>>>>>>> '
 ```
 
 **You should see:** nothing from either command. The first lists files not
-yet marked as fixed; the second finds any conflict markers left in the code.
+yet marked as fixed - including files you changed again after marking them
+fixed; `git add` each one when you are happy with it. The second finds any
+conflict markers left in the code.
 
-In VS Code you can check too: **Merge Changes** in Source Control should be
-empty, and searching all files (`Ctrl+Shift+F`) for `<<<<<<<` should find
-nothing.
+In VS Code you can check too: **Merge Changes** and **Changes** in Source
+Control should both be empty (everything is under **Staged Changes**), and
+searching all files (`Ctrl+Shift+F`) for `<<<<<<<` should find nothing.
 
 ### Finish the merge
 
