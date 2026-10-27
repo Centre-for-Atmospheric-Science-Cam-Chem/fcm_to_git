@@ -543,6 +543,22 @@ You left out `--no-edit`. The message is already filled in - just save and
 close: in `vi` type `:wq` and press Enter; in `nano` press `Ctrl+O`, Enter,
 then `Ctrl+X`.
 
+### After the merge commit, `git status` still shows a modified file
+
+You changed the file again after marking it fixed (`git add`, or the **+** in
+VS Code), so the merge commit has the earlier version. If you have not pushed
+yet, add the change to the merge commit:
+
+```bash
+source ~/fcm_to_git_work/my_branch.sh
+cd "$GH_CLONE"
+git add path/to/file
+git commit --amend --no-edit
+```
+
+If you have already pushed, make it a normal commit instead
+(`git commit -m "Finish merge of $MERGE_TAG"`) and push again.
+
 ### I made the merge commit, but got it wrong
 
 The merge is on the copy (e.g. `2025.12.1_...`), so your migrated branch is
