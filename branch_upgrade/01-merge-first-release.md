@@ -1,11 +1,10 @@
-# 6. Optional: bring your branch up to the first GitHub release
+# 1. Upgrade an existing Git branch to a new version
 
-Your branch is now on GitHub, but it is still based on the old release it
-started from (e.g. `um13.7`). In this step you merge in `2025.12.1` - the
-first release made on GitHub - into a copy of your branch.
+Your branch is now on GitHub, but may still based on the old release it
+started from (e.g. `um13.7`). In this step you merge in a target tagged release (e.g. `2025.12.1` - the
+first release made on GitHub) into a copy of your branch.
 
-**This step is optional.** Most branches stop after step 5: your branch and
-its full history are on GitHub, as exactly the same code as on FCM.
+This method works for upgrading to any tagged release version, from an old pre-git migration version (e.g. `um13.7`), a git migrated version (e.g. `2025.12.1`), or even branch in-between tagged releases. Provided the target tag version is ahead of your branch.
 
 Do this step only if you want to carry on developing your branch on GitHub.
 The Met Office says branches need to be on at least the first GitHub release
@@ -34,6 +33,8 @@ safe to try: do 6.1 and 6.2, look at how many conflicts there are, and if it
 is too much, cancel (see [Changed your mind?](#changed-your-mind)) - nothing
 is lost.
 
+If in trouble don't be afraid to ask - merging can be challenging.
+
 ## Which release to merge
 
 Your details file sets `MERGE_TAG=2025.12.1`. That is the recommended choice:
@@ -52,7 +53,7 @@ it can take your branch much further than it needs to go - e.g. from `vn13.8`
 straight to `vn14.2`. Bringing your branch up to the latest release is only
 needed for a pull request - see [What next](#what-next).
 
-## 6.1 Make a copy of your branch
+## 1.1 Make a copy of your branch
 
 Do the merge on a **copy** of your branch. Your migrated branch stays exactly
 as it came from FCM - a record of your work that still matches the old code -
@@ -69,9 +70,11 @@ If your details file was made before step 6 was added, it has no
 `~/fcm_to_git_work/my_branch.sh`:
 
 ```bash
-MERGE_TAG=2025.12.1
-MERGED_BRANCH=${MERGE_TAG}_$(sed -E 's/^((um|vn)[0-9.]+|r[0-9]+)_//' \
-                               <<<"$BRANCH")
+TARGET_TAG=2025.12.1
+...
+UPGRADED_BRANCH=${TARGET_TAG}_$(sed -E \
+    -e 's/^[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}_//' \
+    -e 's/^((um|vn)[0-9.]+|r[0-9]+)_//' <<<"$BRANCH")
 ```
 
 First check your branch is clean:
@@ -99,7 +102,7 @@ Then make the copy and switch to it:
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
 cd "$GH_CLONE"
-git switch -c "$MERGED_BRANCH"
+git switch -c "$UPGRADED_BRANCH"
 ```
 
 **You should see:**
@@ -110,7 +113,7 @@ Switched to a new branch '2025.12.1_transformed_ukca_gpuport_nvtx_calipers'
 
 The rest of this step works on the copy.
 
-## 6.2 Merge
+## 1.2 Merge
 
 **Run in:** your GitHub clone
 
@@ -118,7 +121,7 @@ The rest of this step works on the copy.
 source ~/fcm_to_git_work/my_branch.sh
 cd "$GH_CLONE"
 git fetch upstream --tags
-git merge -m "Update to $MERGE_TAG" "$MERGE_TAG"
+git merge -m "Update to $TARGET_TAG" "$TARGET_TAG"
 ```
 
 There are two possible results.
@@ -130,7 +133,7 @@ Merge made by the 'ort' strategy.
  639 files changed, 16188 insertions(+), 12210 deletions(-)
 ```
 
-Go on to [6.4](#64-update-dependenciesyaml).
+Go on to [1.4](#64-update-dependenciesyaml).
 
 **There are conflicts** - places where both your branch and trunk changed the
 same lines, so git cannot decide which to keep. It lists them and ends with:
@@ -140,9 +143,9 @@ CONFLICT (content): Merge conflict in src/control/top_level/atm_step_4A.F90
 Automatic merge failed; fix conflicts and then commit the result.
 ```
 
-Go on to 6.3.
+Go on to 1.3.
 
-## 6.3 Fix the conflicts
+## 1.3 Fix the conflicts
 
 ### List the files with conflicts
 
@@ -351,10 +354,10 @@ source ~/fcm_to_git_work/my_branch.sh
 cd "$GH_CLONE"
 git merge --abort
 git switch "$BRANCH"
-git branch -D "$MERGED_BRANCH"
+git branch -D "$UPGRADED_BRANCH"
 ```
 
-## 6.4 Update `dependencies.yaml`
+## 1.4 Update `dependencies.yaml`
 
 `dependencies.yaml` lists the other repositories the test suite uses, and
 which version of each (`ref:`). Look at yours:
@@ -394,33 +397,10 @@ If you changed it, commit the change:
 source ~/fcm_to_git_work/my_branch.sh
 cd "$GH_CLONE"
 git add dependencies.yaml
-git commit -m "Pin dependencies for $MERGE_TAG"
+git commit -m "Pin dependencies for $TARGET_TAG"
 ```
 
-## 6.5 Test your branch
-
-**Testing is up to you** - only you know what your changes do and how to
-check them. (Steps 1 to 5 need no testing: the script checks your migrated
-branch is exactly the same code as your FCM branch. Only this step changes
-code.)
-
-Some suggestions:
-
-1. **Check it builds.**
-2. **Run what you ran before.** Whatever you used to check this work on FCM -
-   your own suite, a test case, a box model run - run it on both your
-   migrated branch (the old release) and this copy (the new release), and
-   compare. Differences should be explained by the release, not by your
-   changes going missing.
-3. **Run rose stem if your site can.** If your machine can run the GitHub
-   test suite for this repository, run it - see the Met Office
-   [testing guide](https://metoffice.github.io/simulation-systems/Development/testing.html).
-   The test suites often do not cover research changes, so this is not a
-   replacement for 2.
-4. **Do not rely on the copy until it runs.** You can still push it in 6.6 -
-   e.g. to back it up - but it is not finished until it does.
-
-## 6.6 Push
+## 1.5 Push
 
 Look at the result - your commits are at the top, and below them the merge
 and your FCM commits (`--first-parent` hides the trunk commits the merge
@@ -439,7 +419,7 @@ git log --oneline --first-parent -5
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
 cd "$GH_CLONE"
-git push -u origin "$MERGED_BRANCH"
+git push -u origin "$UPGRADED_BRANCH"
 ```
 
 **You should see** a line ending
@@ -451,14 +431,6 @@ release. To see everything the merge changed:
 ```bash
 source ~/fcm_to_git_work/my_branch.sh
 cd "$GH_CLONE"
-git diff --stat "$BRANCH" "$MERGED_BRANCH"
+git diff --stat "$BRANCH" "$UPGRADED_BRANCH"
 ```
 
-## What next
-
-You can carry on working on the copy as on any GitHub branch. When it is ready
-to go into UKCA as a pull request, the reviewers will ask you to bring it up
-to date with the latest release first - see the Met Office guides on
-[branch migration](https://metoffice.github.io/simulation-systems/WorkingPractices/branch_migration.html)
-and [updating a branch](https://metoffice.github.io/simulation-systems/WorkingPractices/maintaining_forks.html#updating-branch).
-Until then, there is no need to chase `stable`.
