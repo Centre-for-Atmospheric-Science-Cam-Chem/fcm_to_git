@@ -62,8 +62,11 @@ GitHub:  tag um13.7  ──> your branch: one commit per FCM revision
    the `fcm_to_git.sh` script does this.
 5. [Review the commits, then push](05-review-and-push.md) - check, then send
    to your fork on GitHub.
-6. *Optional:* [Bring your branch up to the first GitHub release](06-merge-first-release.md) -
-   only if you want to carry on developing your branch on GitHub.
+
+Your branch then still starts from its old FCM release (e.g. `um13.7`). To
+carry on developing it on GitHub, you can then bring it up to a GitHub
+release - a separate guide:
+[Upgrade a GitHub branch to a new release](../branch_upgrade/README.md).
 
 ## What you need
 
@@ -75,10 +78,6 @@ GitHub:  tag um13.7  ──> your branch: one commit per FCM revision
   On **Monsoon**, SSH to GitHub is blocked - see
   [If SSH to GitHub does not work](#if-ssh-to-github-does-not-work-eg-monsoon).
 - About 30 minutes for the first branch.
-- Only for the optional step 6: [VS Code](https://code.visualstudio.com/),
-  which makes fixing merge conflicts much easier. If your machine is remote,
-  use it with the
-  [Remote - SSH](https://code.visualstudio.com/docs/remote/ssh) extension.
 
 ## Check your machine is ready
 
@@ -173,7 +172,7 @@ Everything goes in one folder, `~/fcm_to_git_work`:
 mkdir -p ~/fcm_to_git_work/github
 cd ~/fcm_to_git_work
 git clone git@github.com:Centre-for-Atmospheric-Science-Cam-Chem/fcm_to_git.git
-cp fcm_to_git/my_branch_template.sh my_branch.sh
+cp fcm_to_git/branch_migration/my_branch_template.sh my_branch.sh
 ```
 
 ## Your details file

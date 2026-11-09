@@ -82,7 +82,7 @@ fcm_to_git: [2/107] 9c7c5e4 fcm_to_git [r5382 robertwaters 2025-02-05 12:33]: Is
 ...
 fcm_to_git: [107/107] d67857b fcm_to_git [r5863 robertwaters 2025-04-02 10:18]: #233 - added the psyclone transformer to the repo directly
 fcm_to_git: done - 'um13.7_transformed_ukca_gpuport_nvtx_calipers' matches the FCM branch at r5863
-fcm_to_git: nothing has been pushed - review the commits (docs/05-review-and-push.md)
+fcm_to_git: nothing has been pushed - review the commits (branch_migration/05-review-and-push.md)
 ```
 
 `done - ... matches the FCM branch` means the script has checked that the code
@@ -163,7 +163,7 @@ may need to go in first, or with yours.
 3. For each of your FCM revisions:
    - updates the temporary checkout to that revision
    - copies it into your GitHub clone, as in the Met Office guide:
-     `rsync -a --delete --exclude=.git --exclude=.svn`
+     `rsync -a --checksum --delete --exclude=.git --exclude=.svn`
    - commits it with the original message
 4. Checks your git branch now holds exactly the same code as the latest
    revision of your FCM branch.
