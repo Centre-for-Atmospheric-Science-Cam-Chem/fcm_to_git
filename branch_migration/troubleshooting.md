@@ -382,7 +382,7 @@ git branch -D "$BRANCH"
 ### `ERROR: could not read the history of ...`
 
 `svn` could not read your FCM branch. Either the address is wrong - check
-`FCM_URL` in your details file against `fcm info` (step 1.3) - or `svn` could
+`FCM_URL` in your details file against `fcm info` (step 1.2) - or `svn` could
 not log in to MOSRS - see
 [the password problem above](#authentication-failed--no-more-credentials--svn-could-not-log-in-to-mosrs--asked-for-a-mosrs-password).
 
@@ -413,7 +413,7 @@ include everything the script printed.
 ### `ERROR: could not find the FCM branch ...`
 
 `svn` logged in, but there is no branch at that address. Check `FCM_URL` in
-your details file against the `URL:` line of `fcm info` (step 1.3).
+your details file against the `URL:` line of `fcm info` (step 1.2).
 
 ### It keeps asking for my MOSRS password
 

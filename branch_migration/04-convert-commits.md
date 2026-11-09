@@ -163,7 +163,7 @@ may need to go in first, or with yours.
 3. For each of your FCM revisions:
    - updates the temporary checkout to that revision
    - copies it into your GitHub clone, as in the Met Office guide:
-     `rsync -a --delete --exclude=.git --exclude=.svn`
+     `rsync -a --checksum --delete --exclude=.git --exclude=.svn`
    - commits it with the original message
 4. Checks your git branch now holds exactly the same code as the latest
    revision of your FCM branch.

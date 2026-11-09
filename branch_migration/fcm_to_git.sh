@@ -13,7 +13,7 @@
 # Nothing is pushed: review the commits, then push yourself
 # (branch_migration/05-review-and-push.md).
 
-set -euo pipefail
+set -euoE pipefail
 
 usage() {
   cat <<EOF
@@ -68,9 +68,11 @@ same_code() {
   return $differ
 }
 
-# Never stop silently.
-trap 'echo "fcm_to_git: ERROR: unexpected failure at line $LINENO -" \
-           "please report this" >&2' ERR
+# Never stop silently. Only the main shell reports, or a failure inside
+# $(...) would be reported twice.
+trap '[[ $BASH_SUBSHELL -gt 0 ]] \
+        || echo "fcm_to_git: ERROR: unexpected failure at line $LINENO -" \
+                "please report this" >&2' ERR
 
 dry_run=false
 while getopts "dh" opt; do
@@ -322,7 +324,7 @@ if $start_commit; then
 fi
 
 info "checking out r$base_rev ..."
-svn checkout -q "$svn_url@$base_rev" "$wc"
+svn checkout -q --ignore-externals "$svn_url@$base_rev" "$wc"
 
 # The git branch must hold exactly the code of the FCM branch at base_rev,
 # otherwise the first commit would also contain unrelated differences.
@@ -337,8 +339,9 @@ fi
 # --- Convert each revision ---------------------------------------------------
 
 # If anything fails part way, say how to tidy up and carry on.
-trap 'echo "fcm_to_git: stopped while copying r$rev." \
-           "To carry on, tidy up and run again:
+trap '[[ $BASH_SUBSHELL -gt 0 ]] \
+        || echo "fcm_to_git: stopped while copying r$rev." \
+                "To carry on, tidy up and run again:
   cd $git_clone && git reset --hard && git clean -fd
   If svn could not log in to MOSRS, run mosrs-cache-password first." >&2' ERR
 
@@ -348,8 +351,12 @@ trap 'echo "fcm_to_git: stopped while copying r$rev." \
 commit_rev() {
   local rev=$1 extra=${3:-}
 
-  rsync -a --delete --exclude=.git --exclude=.svn "$wc/" "$git_clone/"
-  in_clone add -A
+  # --checksum: by default rsync skips a file with the same size and time,
+  # which misses a same-size edit made within the same second.
+  rsync -a --checksum --delete --exclude=.git --exclude=.svn \
+    "$wc/" "$git_clone/"
+  # --force: keep every FCM file, even one matching a git ignore rule.
+  in_clone add -A --force
 
   read_rev "$rev" "${2:-}"
   {
@@ -397,11 +404,12 @@ fi
 n=0
 for rev in "${todo[@]}"; do
   n=$((n + 1))
-  svn update -q -r "$rev" "$wc"
+  svn update -q --ignore-externals -r "$rev" "$wc"
   commit_rev "$rev"
   info "[$n/${#todo[@]}] $(in_clone log -1 --format='%h %s')"
 done
-last_done=${todo[-1]:-$create_rev}
+last_done=$create_rev
+[[ ${#todo[@]} -eq 0 ]] || last_done=${todo[-1]}
 
 # --- Final check -------------------------------------------------------------
 
