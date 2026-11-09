@@ -1,14 +1,32 @@
 # fcm_to_git
-A tool for converting branches from the old Met Office FCM system to Github
+Guides and a tool for moving branches from the old Met Office FCM system to
+GitHub, and bringing them up to date there.
 
-Moves your UKCA branch from FCM (MOSRS) to your fork on GitHub, keeping every
-commit. No git knowledge needed - each step gives the commands to run, where to
-run them, and what you should see.
+No git knowledge needed - each step gives the commands to run, where to run
+them, and what you should see. Written for UKCA; also tested on the UM and
+LFRic Apps (see [Other repositories](#other-repositories)).
+
+## Which guide do I need?
+
+There are two separate jobs. Do one, or both, one after the other:
+
+| You want to...                                                  | Guide |
+|-----------------------------------------------------------------|-------|
+| Move a branch from FCM to your GitHub fork, keeping every commit | [Migrate an FCM branch to GitHub](branch_migration/README.md) |
+| Bring a branch already on GitHub up to a newer release           | [Upgrade a GitHub branch to a new release](branch_upgrade/README.md) |
+
+- **Only want your work kept on GitHub?** Migrating is enough. Your branch
+  stays on its old FCM release (e.g. `um13.7`), exactly as it was on FCM.
+- **Want to carry on developing it on GitHub?** Migrate it, then upgrade it -
+  the GitHub test suites need at least the first GitHub release,
+  `2025.12.1`.
+- **Already on GitHub** (migrated with this guide, by the Met Office's
+  method, or started on GitHub)? Just upgrade.
 
 ## What you end up with
 
-Your branch on GitHub, with every FCM commit, newest at the top - e.g. for
-`robertwaters/r5776_ukca_gpuport_nvtx_calipers`:
+After both guides, your branch on GitHub has every FCM commit, newest at the
+top - e.g. for `robertwaters/r5776_ukca_gpuport_nvtx_calipers`:
 
 ```
 Update to 2025.12.1
@@ -20,12 +38,12 @@ fcm_to_git [r5973 robertwaters 2025-04-22 14:44]: #233 - added nvtx calipers to 
 ...
 ```
 
-- Each `fcm_to_git [...]` commit is one of your FCM commits (steps 1 to 5),
-  with its original revision, author, date and message. The code at each one
-  is exactly the code on FCM at that revision.
-- `Update to 2025.12.1` at the top is the optional step 6: your work merged
-  into the first GitHub release, on a copy of your branch, so you can carry on
-  developing it on GitHub.
+- Each `fcm_to_git [...]` commit is one of your FCM commits (from the
+  migration guide), with its original revision, author, date and message. The
+  code at each one is exactly the code on FCM at that revision.
+- `Update to 2025.12.1` at the top is from the upgrade guide: your work
+  merged into the first GitHub release, on a copy of your branch, so you can
+  carry on developing it on GitHub.
 
 ## Releases and tags
 
@@ -42,34 +60,20 @@ every FCM one, and each release contains everything before it:
 | | `2026.03.1` = `2026.03.2` | `2026.03.2` = `vn14.1` | `2026.03.1` = `vn3.1` |
 | | `2026.07.1` | `2026.07.1` = `vn14.2` | `2026.07.1` = `vn3.2` |
 
-- Your FCM branch starts from one of the FCM tags (steps 1 and 3).
-- The optional step 6 merges in `2025.12.1`, the first GitHub release - e.g.
-  only 22 commits after `um13.9` in UKCA.
+- A migrated branch starts from one of the FCM tags.
+- The upgrade guide recommends `2025.12.1`, the first GitHub release, for a
+  branch from FCM - e.g. only 22 commits after `um13.9` in UKCA.
 - The same date tag goes together across repositories: the UM's `2025.12.1`
   uses UKCA `2025.12.1`. UKCA has no `um14.x` names - `2025.12.1` is the UKCA
   that goes with UM `vn14.0`.
 - `stable` is a branch that always points at the latest release (in October
   2026: `2026.07.1` for UKCA and the UM, `2026.07.2` for LFRic Apps).
 
-## Guide
-
-0. [Before you start](docs/00-before-you-start.md) - what forks, clones and
-   commits are; what you need; setting up
-1. [Find your FCM branch and where it started](docs/01-find-fcm-branch.md)
-2. [Fork UKCA on GitHub and bring across the tags](docs/02-fork-and-tags.md)
-3. [Create a GitHub branch for your work](docs/03-create-github-branch.md)
-4. [Copy your FCM commits onto the git branch](docs/04-convert-commits.md) - runs `fcm_to_git.sh`
-5. [Review the commits, then push](docs/05-review-and-push.md)
-6. *Optional:* [Bring your branch up to the first GitHub release](docs/06-merge-first-release.md)
-
-Something not working? See [Troubleshooting](docs/troubleshooting.md).
-
 ## Other repositories
 
-The guide is written for UKCA, but `fcm_to_git.sh` should work for any FCM
+The guides are written for UKCA, but `fcm_to_git.sh` should work for any FCM
 project that has moved to GitHub with its trunk history. It has been tested on
 branches of `um` and `lfric_apps` as well as `ukca`. For another project,
-set `REPO_NAME` in your details file (see
-[step 0](docs/00-before-you-start.md#your-details-file)) to `um` or
-`lfric_apps` - the commands then use the right repository. The UM and LFRic Apps tag their
-releases `vn13.9`, `vn2.2` and so on, rather than `um13.9`.
+set `REPO_NAME` in your details file to `um` or `lfric_apps` - the commands
+then use the right repository. The UM and LFRic Apps tag their FCM releases
+`vn13.9`, `vn2.2` and so on, rather than `um13.9`.

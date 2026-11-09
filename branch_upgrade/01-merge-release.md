@@ -1,24 +1,19 @@
-# 1. Upgrade an existing Git branch to a new version
+# 1. Merge the new release into a copy of your branch
 
-Your branch is now on GitHub, but may still based on the old release it
-started from (e.g. `um13.7`). In this step you merge in a target tagged release (e.g. `2025.12.1` - the
-first release made on GitHub) into a copy of your branch.
+In this step you merge a release (`TARGET_TAG`, e.g. `2025.12.1`) into a copy
+of your branch.
 
-This method works for upgrading to any tagged release version, from an old pre-git migration version (e.g. `um13.7`), a git migrated version (e.g. `2025.12.1`), or even branch in-between tagged releases. Provided the target tag version is ahead of your branch.
+It works for any release that is newer than your branch: from an FCM release
+(e.g. `um13.7`), from a GitHub release (e.g. `2025.12.1` to `2026.07.1`), or
+from somewhere in between releases.
 
-Do this step only if you want to carry on developing your branch on GitHub.
-The Met Office says branches need to be on at least the first GitHub release
-to run the GitHub test suites. Since the move, the test suites have changed -
-e.g. a new `dependencies.yaml`, `.rc` files renamed to `.cylc` - and
-`2025.12.1` is the first release with those changes.
-
-Problems? See [Troubleshooting: Step 6](troubleshooting.md#step-6---merge-a-release).
+Problems? See [Troubleshooting: Step 1](troubleshooting.md#step-1---merge-the-release).
 
 ## How much work is it?
 
 For some branches this is quick; for others it is a real job. It depends on
 how many files your branch changed that were also changed on trunk. For
-example, merging `2025.12.1` into a few real branches gave:
+example, merging `2025.12.1` into a few real branches migrated from FCM gave:
 
 | Branch                                         | Conflicts |
 |------------------------------------------------|-----------|
@@ -29,60 +24,58 @@ example, merging `2025.12.1` into a few real branches gave:
 
 The older your branch, the more work it usually is: from `um13.0`, it is
 upgrading across many releases - the same job as upgrading in FCM. It is
-safe to try: do 6.1 and 6.2, look at how many conflicts there are, and if it
+safe to try: do 1.1 and 1.2, look at how many conflicts there are, and if it
 is too much, cancel (see [Changed your mind?](#changed-your-mind)) - nothing
 is lost.
 
-If in trouble don't be afraid to ask - merging can be challenging.
+If in trouble, don't be afraid to ask - merging can be challenging.
 
 ## Which release to merge
 
-Your details file sets `MERGE_TAG=2025.12.1`. That is the recommended choice:
+Your details file sets `TARGET_TAG=2025.12.1`. For a branch from FCM, that
+is the recommended choice:
 
-- **`2025.12.1`** (recommended) - the first GitHub release. The smallest step
-  that gets the GitHub test suites. It is only a few commits after
-  `git_migration`, and in the branches above it gave exactly the same
-  conflicts as `git_migration`.
+- **`2025.12.1`** (recommended) - the first GitHub release. The Met Office
+  says branches need to be on at least this release to run the GitHub test
+  suites: since the move, they have changed - e.g. a new
+  `dependencies.yaml`, `.rc` files renamed to `.cylc`. It is the smallest
+  step that gets them. It is only a few commits after `git_migration`, and
+  in the branches above it gave exactly the same conflicts as
+  `git_migration`.
 - **`git_migration`** - the last FCM version of trunk. Choose this only if
   you want trunk up to the move but want to keep the old, FCM-era test suite
-  setup. Change the line to `MERGE_TAG=git_migration`.
+  setup. Change the line to `TARGET_TAG=git_migration`.
+- **A later release** (see the
+  [table of releases](../README.md#releases-and-tags)) - if you need
+  something only in that release, or your branch is already on a GitHub
+  release. Use a release tag such as `2026.07.1`.
 
 **Do not merge `stable`** (or `main`) for this. `stable` is the *latest*
 GitHub release, and it moves on: for the UM it is already `vn14.2`. Merging
 it can take your branch much further than it needs to go - e.g. from `vn13.8`
 straight to `vn14.2`. Bringing your branch up to the latest release is only
-needed for a pull request - see [What next](#what-next).
+needed for a pull request - see
+[What next](02-test-upgraded-branch.md#what-next).
 
 ## 1.1 Make a copy of your branch
 
-Do the merge on a **copy** of your branch. Your migrated branch stays exactly
-as it came from FCM - a record of your work that still matches the old code -
-and if the merge goes wrong, you just delete the copy and start again.
+Do the merge on a **copy** of your branch. Your original branch stays
+exactly as it is - e.g. for a branch migrated from FCM, a record of your work
+that still matches the old code - and if the merge goes wrong, you just
+delete the copy and start again.
 
 The copy is named after your branch, but starting with the release you merge
 instead of the old one, because that is the code it will be based on - e.g.
 `um13.7_transformed_ukca_gpuport_nvtx_calipers` becomes
 `2025.12.1_transformed_ukca_gpuport_nvtx_calipers`. Your details file works
-this name out for you, as `MERGED_BRANCH`.
-
-If your details file was made before step 6 was added, it has no
-`MERGE_TAG` or `MERGED_BRANCH` lines - add these to the end of
-`~/fcm_to_git_work/my_branch.sh`:
-
-```bash
-TARGET_TAG=2025.12.1
-...
-UPGRADED_BRANCH=${TARGET_TAG}_$(sed -E \
-    -e 's/^[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}_//' \
-    -e 's/^((um|vn)[0-9.]+|r[0-9]+)_//' <<<"$BRANCH")
-```
+this name out for you, as `UPGRADED_BRANCH`.
 
 First check your branch is clean:
 
 **Run in:** your GitHub clone
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 git switch "$BRANCH"
 git status
@@ -100,7 +93,7 @@ nothing to commit, working tree clean
 Then make the copy and switch to it:
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 git switch -c "$UPGRADED_BRANCH"
 ```
@@ -118,7 +111,7 @@ The rest of this step works on the copy.
 **Run in:** your GitHub clone
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 git fetch upstream --tags
 git merge -m "Update to $TARGET_TAG" "$TARGET_TAG"
@@ -133,7 +126,7 @@ Merge made by the 'ort' strategy.
  639 files changed, 16188 insertions(+), 12210 deletions(-)
 ```
 
-Go on to [1.4](#64-update-dependenciesyaml).
+Go on to [1.4](#14-update-dependenciesyaml).
 
 **There are conflicts** - places where both your branch and trunk changed the
 same lines, so git cannot decide which to keep. It lists them and ends with:
@@ -152,7 +145,7 @@ Go on to 1.3.
 **Run in:** your GitHub clone
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 git diff --name-only --diff-filter=U
 ```
@@ -191,18 +184,20 @@ A good rule:
   release's changes *and* yours. If you are unsure, ask someone who knows
   that code.
 
-To see whether you worked on a file, list your FCM commits that changed it:
+To see whether you worked on a file, list the commits on your branch that
+changed it:
 
 **Run in:** your GitHub clone
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
-git log --oneline "$START..$BRANCH" -- path/to/file
+git log --oneline --no-merges "$TARGET_TAG..$BRANCH" -- path/to/file
 ```
 
 If the commits listed are your development work, it is your file. If none
-are, or they are only trunk merges, take the release's version.
+are, or they are only trunk merges (e.g. an `fcm merge` from your FCM days),
+take the release's version.
 
 ### Fix each file - with VS Code (recommended)
 
@@ -212,7 +207,7 @@ clone in it:
 **Run in:** your GitHub clone
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 code "$GH_CLONE"
 ```
 
@@ -268,7 +263,7 @@ of both - and delete the three marker lines (`<<<<<<<`, `=======`,
 **Run in:** your GitHub clone
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 git add path/to/the/file.F90
 ```
@@ -311,7 +306,7 @@ delete it too (`git rm dependencies.sh`) - it is replaced by
 **Run in:** your GitHub clone
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 git diff --name-only
 git grep -n -e '^<<<<<<< ' -e '^>>>>>>> '
@@ -331,7 +326,7 @@ searching all files (`Ctrl+Shift+F`) for `<<<<<<<` should find nothing.
 **Run in:** your GitHub clone
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 git commit --no-edit --cleanup=strip
 ```
@@ -347,10 +342,10 @@ back exactly as it was:
 git merge --abort
 ```
 
-To give up on the copy altogether (your migrated branch is not touched):
+To give up on the copy altogether (your original branch is not touched):
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 git merge --abort
 git switch "$BRANCH"
@@ -365,7 +360,7 @@ which version of each (`ref:`). Look at yours:
 **Run in:** your GitHub clone
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 cat dependencies.yaml
 ```
@@ -394,7 +389,7 @@ empty `source:` and `ref:` - that means "this clone".
 If you changed it, commit the change:
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 git add dependencies.yaml
 git commit -m "Pin dependencies for $TARGET_TAG"
@@ -402,14 +397,14 @@ git commit -m "Pin dependencies for $TARGET_TAG"
 
 ## 1.5 Push
 
-Look at the result - your commits are at the top, and below them the merge
-and your FCM commits (`--first-parent` hides the trunk commits the merge
-brought in):
+Look at the result - newest at the top: any commits you made after the merge
+(e.g. 1.4), the merge, and below it your branch's own commits
+(`--first-parent` hides the trunk commits the merge brought in):
 
 **Run in:** your GitHub clone
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 git log --oneline --first-parent -5
 ```
@@ -417,7 +412,7 @@ git log --oneline --first-parent -5
 (Press `q` to get out of the viewer.) Then push the copy to your fork:
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 git push -u origin "$UPGRADED_BRANCH"
 ```
@@ -425,12 +420,14 @@ git push -u origin "$UPGRADED_BRANCH"
 **You should see** a line ending
 `* [new branch]      2025.12.1_transformed_ukca_gpuport_nvtx_calipers -> 2025.12.1_transformed_ukca_gpuport_nvtx_calipers`.
 
-Your fork now has both branches: the migrated one, and the copy based on the
+Your fork now has both branches: the original, and the copy based on the
 release. To see everything the merge changed:
 
 ```bash
-source ~/fcm_to_git_work/my_branch.sh
+source ~/branch_upgrade_work/my_branch.sh
 cd "$GH_CLONE"
 git diff --stat "$BRANCH" "$UPGRADED_BRANCH"
 ```
+
+Next: [step 2 - test your upgraded branch](02-test-upgraded-branch.md).
 

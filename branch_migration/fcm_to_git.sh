@@ -3,15 +3,15 @@
 # per SVN revision.
 #
 # The git branch must already start from the same code the FCM branch was
-# created from (see docs/03-create-github-branch.md). For each revision, a
-# private SVN working copy is updated to that revision and rsynced into the
-# git clone, and the result is committed with the original SVN message,
-# prefixed with the original revision, author and date.
+# created from (see branch_migration/03-create-github-branch.md). For each
+# revision, a private SVN working copy is updated to that revision and
+# rsynced into the git clone, and the result is committed with the original
+# SVN message, prefixed with the original revision, author and date.
 #
 # Re-running continues after the last revision already converted.
 #
 # Nothing is pushed: review the commits, then push yourself
-# (docs/05-review-and-push.md).
+# (branch_migration/05-review-and-push.md).
 
 set -euo pipefail
 
@@ -413,4 +413,4 @@ fi
 
 info "done - '$git_branch' matches the FCM branch at r$last_done"
 info "nothing has been pushed - review the commits" \
-     "(docs/05-review-and-push.md)"
+     "(branch_migration/05-review-and-push.md)"

@@ -118,8 +118,9 @@ commit count (clock icon) to see your commits.
 Your branch is now on GitHub, with its full history. For most branches,
 that's it - you are done.
 
-Optional: [step 6](06-merge-first-release.md) - only if you want to carry on
-developing your branch on GitHub.
+Your branch still starts from its old FCM release. If you want to carry on
+developing it on GitHub, bring it up to a GitHub release next - see
+[Upgrade a GitHub branch to a new release](../branch_upgrade/README.md).
 
 ## If something looks wrong
 
