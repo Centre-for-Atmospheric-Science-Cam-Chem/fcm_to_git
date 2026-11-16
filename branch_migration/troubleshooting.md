@@ -179,6 +179,26 @@ git remote -v
 [2.4](02-fork-and-tags.md#24-link-your-clone-to-the-official-repository).
 Then run the command that failed again.
 
+### `ERROR: The 'MetOffice' organization has enabled or enforced SAML SSO`
+
+Your SSH key works for your own fork, but has not been allowed into the
+MetOffice organisation on GitHub, so any command that talks to `upstream`
+fails. Allow it once, in a browser:
+
+1. On GitHub, click your profile picture (top right) > **Settings** >
+   **SSH and GPG keys**.
+2. Next to the key for this machine, click **Configure SSO**.
+3. Next to **MetOffice**, click **Authorize**, and log in if asked.
+
+Then run the command that failed again. The key stays allowed until the
+MetOffice organisation revokes it or you leave the organisation - you do not
+need to do this again. A new SSH key (e.g. on another machine) needs
+allowing separately.
+
+(If there is no **Configure SSO** button, you have not yet logged in to the
+MetOffice organisation through its single sign-on: go to
+<https://github.com/orgs/MetOffice/sso>, log in, then try again.)
+
 ### GitHub says I already have a fork
 
 Fine - GitHub takes you to your existing fork. Carry on from 2.2, and make
