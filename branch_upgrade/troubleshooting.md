@@ -130,6 +130,26 @@ with `upstream` in it fails until you add the link - see
 [step 0.5](00-before-you-start.md#05-link-your-clone-to-the-official-repository-and-get-the-tags).
 Then run the command that failed again.
 
+### `ERROR: The 'MetOffice' organization has enabled or enforced SAML SSO`
+
+Your SSH key works for your own fork, but has not been allowed into the
+MetOffice organisation on GitHub, so any command that talks to `upstream`
+fails. Allow it once, in a browser:
+
+1. On GitHub, click your profile picture (top right) > **Settings** >
+   **SSH and GPG keys**.
+2. Next to the key for this machine, click **Configure SSO**.
+3. Next to **MetOffice**, click **Authorize**, and log in if asked.
+
+Then run the command that failed again. The key stays allowed until the
+MetOffice organisation revokes it or you leave the organisation - you do not
+need to do this again. A new SSH key (e.g. on another machine) needs
+allowing separately.
+
+(If there is no **Configure SSO** button, you have not yet logged in to the
+MetOffice organisation through its single sign-on: go to
+<https://github.com/orgs/MetOffice/sso>, log in, then try again.)
+
 ### `git remote add` says `remote upstream already exists`
 
 Fine - it was added before. Check it with `git remote -v`: `upstream` should
